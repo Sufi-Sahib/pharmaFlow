@@ -31,11 +31,12 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    allowedDevOrigins: [
-      "https://*.cloudworkstations.dev",
-      "https://*.firebase.studio",
-    ],
+    // allowedDevOrigins is a top-level property, not inside experimental for this Next.js version
   },
+  allowedDevOrigins: [
+    "https://*.cloudworkstations.dev",
+    "https://*.firebase.studio",
+  ],
 };
 
 export default nextConfig;
