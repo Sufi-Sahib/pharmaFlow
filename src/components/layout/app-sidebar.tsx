@@ -14,10 +14,6 @@ import {
   Gavel,
   AreaChart,
   Settings,
-  BookUser,
-  Truck,
-  User,
-  Wallet,
 } from 'lucide-react';
 import { PharmaFlowLogo } from '@/components/icons';
 
@@ -39,38 +35,6 @@ export function AppSidebar() {
               <SidebarMenuButton tooltip="Dashboard">
                 <Home />
                 <span>Dashboard</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/booker">
-              <SidebarMenuButton tooltip="Booker">
-                <BookUser />
-                <span>Booker</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/delivery">
-              <SidebarMenuButton tooltip="Delivery">
-                <Truck />
-                <span>Delivery</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/customer">
-              <SidebarMenuButton tooltip="Customer">
-                <User />
-                <span>Customer</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link href="/accounts">
-              <SidebarMenuButton tooltip="Accounts">
-                <Wallet />
-                <span>Accounts</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
