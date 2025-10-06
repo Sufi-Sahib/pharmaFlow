@@ -35,52 +35,42 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/" passHref legacyBehavior>
-              <SidebarMenuButton tooltip="Dashboard" asChild>
-                <a>
-                  <Home />
-                  <span>Dashboard</span>
-                </a>
+            <Link href="/">
+              <SidebarMenuButton tooltip="Dashboard">
+                <Home />
+                <span>Dashboard</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/booker" passHref legacyBehavior>
-              <SidebarMenuButton tooltip="Booker" asChild>
-                <a>
-                  <BookUser />
-                  <span>Booker</span>
-                </a>
+            <Link href="/booker">
+              <SidebarMenuButton tooltip="Booker">
+                <BookUser />
+                <span>Booker</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/delivery" passHref legacyBehavior>
-              <SidebarMenuButton tooltip="Delivery" asChild>
-                <a>
-                  <Truck />
-                  <span>Delivery</span>
-                </a>
+            <Link href="/delivery">
+              <SidebarMenuButton tooltip="Delivery">
+                <Truck />
+                <span>Delivery</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/customer" passHref legacyBehavior>
-              <SidebarMenuButton tooltip="Customer" asChild>
-                <a>
-                  <User />
-                  <span>Customer</span>
-                </a>
+            <Link href="/customer">
+              <SidebarMenuButton tooltip="Customer">
+                <User />
+                <span>Customer</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/accounts" passHref legacyBehavior>
-              <SidebarMenuButton tooltip="Accounts" asChild>
-                <a>
-                  <Wallet />
-                  <span>Accounts</span>
-                </a>
+            <Link href="/accounts">
+              <SidebarMenuButton tooltip="Accounts">
+                <Wallet />
+                <span>Accounts</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
