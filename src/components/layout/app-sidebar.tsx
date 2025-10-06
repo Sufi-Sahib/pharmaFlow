@@ -1,13 +1,11 @@
+import Link from 'next/link';
 import {
   Sidebar,
   SidebarHeader,
   SidebarContent,
-  SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import {
   Home,
@@ -16,9 +14,12 @@ import {
   Gavel,
   AreaChart,
   Settings,
+  BookUser,
+  Truck,
+  User,
+  Wallet,
 } from 'lucide-react';
 import { PharmaFlowLogo } from '@/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function AppSidebar() {
   return (
@@ -34,10 +35,54 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Dashboard" isActive>
-              <Home />
-              <span>Dashboard</span>
-            </SidebarMenuButton>
+            <Link href="/" passHref legacyBehavior>
+              <SidebarMenuButton tooltip="Dashboard" asChild>
+                <a>
+                  <Home />
+                  <span>Dashboard</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/booker" passHref legacyBehavior>
+              <SidebarMenuButton tooltip="Booker" asChild>
+                <a>
+                  <BookUser />
+                  <span>Booker</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/delivery" passHref legacyBehavior>
+              <SidebarMenuButton tooltip="Delivery" asChild>
+                <a>
+                  <Truck />
+                  <span>Delivery</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/customer" passHref legacyBehavior>
+              <SidebarMenuButton tooltip="Customer" asChild>
+                <a>
+                  <User />
+                  <span>Customer</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/accounts" passHref legacyBehavior>
+              <SidebarMenuButton tooltip="Accounts" asChild>
+                <a>
+                  <Wallet />
+                  <span>Accounts</span>
+                </a>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Distributors">
