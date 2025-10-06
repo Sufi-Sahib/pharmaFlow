@@ -15,25 +15,25 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const summaryCards = [
     { title: "Total Orders", value: "1,289" },
-    { title: "Total Sales", value: "$152,480.50" },
-    { title: "Payments Received", value: "$141,980.00" },
+    { title: "Total Sales", value: "PKR 15,248,050" },
+    { title: "Payments Received", value: "PKR 14,198,000" },
 ]
 
 const recentOrders = [
-    { id: "ORD-9872", customer: "City Clinic", date: "2023-10-22", total: 450.00, orderStatus: "Delivered", paymentStatus: "Paid" },
-    { id: "ORD-9871", customer: "Wellness Pharmacy", date: "2023-10-21", total: 1250.00, orderStatus: "Shipped", paymentStatus: "Pending" },
-    { id: "ORD-9870", customer: "HealthFirst Meds", date: "2023-10-20", total: 85.50, orderStatus: "Delivered", paymentStatus: "Paid" },
-    { id: "ORD-9869", customer: "City Clinic", date: "2023-10-19", total: 300.00, orderStatus: "Processing", paymentStatus: "Overdue" },
+    { id: "ORD-9872", customer: "City Clinic", date: "2023-10-22", total: 45000.00, orderStatus: "Delivered", paymentStatus: "Paid" },
+    { id: "ORD-9871", customer: "Wellness Pharmacy", date: "2023-10-21", total: 125000.00, orderStatus: "Shipped", paymentStatus: "Pending" },
+    { id: "ORD-9870", customer: "HealthFirst Meds", date: "2023-10-20", total: 8550.00, orderStatus: "Delivered", paymentStatus: "Paid" },
+    { id: "ORD-9869", customer: "City Clinic", date: "2023-10-19", total: 30000.00, orderStatus: "Processing", paymentStatus: "Overdue" },
 ]
 
 const salesReturns = [
-    { id: "RTN-051", customer: "City Clinic", date: "2023-10-23", amount: 150.00, status: "Pending" },
-    { id: "RTN-050", customer: "Wellness Pharmacy", date: "2023-10-21", amount: 75.50, status: "Approved" },
+    { id: "RTN-051", customer: "City Clinic", date: "2023-10-23", amount: 15000.00, status: "Pending" },
+    { id: "RTN-050", customer: "Wellness Pharmacy", date: "2023-10-21", amount: 7550.00, status: "Approved" },
 ];
 
 const salesTeam = [
-  { name: "Ali Khan", target: 15000, achieved: 12500 },
-  { name: "Fatima Ahmed", target: 20000, achieved: 21500 },
+  { name: "Ali Khan", target: 1500000, achieved: 1250000 },
+  { name: "Fatima Ahmed", target: 2000000, achieved: 2150000 },
 ];
 
 const statusColors: { [key: string]: string } = {
@@ -49,6 +49,19 @@ const statusColors: { [key: string]: string } = {
 function AdminDashboard() {
   return (
     <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        {summaryCards.map(card => (
+            <Card key={card.title}>
+                <CardHeader>
+                    <CardTitle>{card.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-2xl font-bold">{card.value}</p>
+                </CardContent>
+            </Card>
+        ))}
+      </div>
+
       <BiddingOverview />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -102,7 +115,7 @@ function AdminDashboard() {
                     <TableRow key={r.id}>
                       <TableCell>{r.id}</TableCell>
                       <TableCell>{r.customer}</TableCell>
-                      <TableCell>${r.amount.toFixed(2)}</TableCell>
+                      <TableCell>PKR {r.amount.toFixed(2)}</TableCell>
                       <TableCell><Badge className={statusColors[r.status]}>{r.status}</Badge></TableCell>
                       <TableCell className="text-right">
                         {r.status === 'Pending' && <Button size="sm">Approve</Button>}
@@ -124,7 +137,7 @@ function AdminDashboard() {
               <div key={member.name}>
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium">{member.name}</span>
-                  <span className="text-sm text-muted-foreground">${member.achieved.toLocaleString()} / ${member.target.toLocaleString()}</span>
+                  <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
                 </div>
                  <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${(member.achieved / member.target) * 100}%` }}></div>

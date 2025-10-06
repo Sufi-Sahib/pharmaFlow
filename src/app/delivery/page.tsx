@@ -11,7 +11,7 @@ import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText } fro
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { deliveryTasks } from "@/lib/data";
+import { activeDeliveries as deliveryTasks } from "@/lib/data";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -45,7 +45,7 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
                                     <p className="text-xs text-muted-foreground">{task.itemsCount} items</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-semibold">${task.amount.toFixed(2)}</p>
+                                    <p className="font-semibold">PKR {task.amount.toFixed(2)}</p>
                                     <Badge variant={task.status === "Delivered" ? "secondary" : "default"}>{task.status}</Badge>
                                 </div>
                             </CardContent>
@@ -109,7 +109,7 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
             <CardContent className="space-y-6">
                 <div className="text-center bg-muted p-6 rounded-lg">
                     <p className="text-muted-foreground">Total Amount Due</p>
-                    <p className="text-5xl font-bold font-headline">${task.amount.toFixed(2)}</p>
+                    <p className="text-5xl font-bold font-headline">PKR {task.amount.toFixed(2)}</p>
                 </div>
                  <Button variant="outline" className="w-full" onClick={() => setIsReturning(true)}>
                     <Undo2 className="mr-2" /> Initiate On-Spot Return

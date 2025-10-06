@@ -13,32 +13,7 @@ import {
   Transaction,
   AccountSummary
 } from "@/lib/types";
-
-const accountSummary: AccountSummary = {
-  customerName: "Ali Pharmacy",
-  creditLimit: 15000,
-  currentBalance: 4820.50,
-  aging: {
-    current: 2500,
-    '30-60': 1500.50,
-    '60-90': 820,
-    '90+': 0
-  }
-};
-
-const invoices: Invoice[] = [
-    { id: "ORD-9872", date: "2023-10-22", dueDate: "2023-11-21", amount: 450.00, status: "Paid" },
-    { id: "ORD-9871", date: "2023-10-21", dueDate: "2023-11-20", amount: 1250.00, status: "Due in 15 days" },
-    { id: "ORD-9869", date: "2023-09-19", dueDate: "2023-10-19", amount: 820.00, status: "Overdue by 34 days" },
-    { id: "ORD-9865", date: "2023-08-15", dueDate: "2023-09-14", amount: 720.00, status: "Paid" },
-];
-
-const transactions: Transaction[] = [
-     { id: "TRN-1234", date: "2023-10-25", description: "Payment for ORD-9872", type: 'Payment', credit: 450.00, runningBalance: 4370.50 },
-     { id: "CN-0012", date: "2023-10-24", description: "Credit Note for Return #RTN-050", type: 'Credit Note', credit: 150.00, runningBalance: 4820.50 },
-     { id: "INV-9872", date: "2023-10-22", description: "Invoice ORD-9872", type: 'Invoice', debit: 450.00, runningBalance: 4970.50 },
-     { id: "TRN-1233", date: "2023-09-18", description: "Payment for ORD-9865", type: 'Payment', credit: 720.00, runningBalance: 4520.50 },
-];
+import { invoices, transactions, accountSummary } from "@/lib/data";
 
 const statusColors: { [key: string]: string } = {
     Paid: "bg-green-100 text-green-800",
@@ -50,7 +25,7 @@ function AgingBucket({ title, amount }: { title: string, amount: number }) {
   return (
     <div className="p-3 bg-muted rounded-lg text-center">
       <p className="text-sm font-semibold">{title}</p>
-      <p className="text-lg font-bold">${amount.toLocaleString()}</p>
+      <p className="text-lg font-bold">PKR {amount.toLocaleString()}</p>
     </div>
   )
 }
@@ -83,11 +58,11 @@ function LedgerScreen() {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <p className="text-sm text-muted-foreground">Current Balance</p>
-                    <p className="text-2xl font-bold text-red-600">${accountSummary.currentBalance.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-red-600">PKR {accountSummary.currentBalance.toFixed(2)}</p>
                 </div>
                  <div>
                     <p className="text-sm text-muted-foreground">Credit Limit</p>
-                    <p className="text-2xl font-bold">${accountSummary.creditLimit.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">PKR {accountSummary.creditLimit.toFixed(2)}</p>
                 </div>
             </div>
             <div>
@@ -130,9 +105,9 @@ function LedgerScreen() {
                         <TableCell className="font-medium">{tx.id}</TableCell>
                         <TableCell>{tx.description}</TableCell>
                         <TableCell><Badge variant="outline">{tx.type}</Badge></TableCell>
-                        <TableCell className="text-right">{tx.debit ? `$${tx.debit.toFixed(2)}` : '-'}</TableCell>
-                        <TableCell className="text-right text-green-600">{tx.credit ? `$${tx.credit.toFixed(2)}` : '-'}</TableCell>
-                        <TableCell className="text-right font-bold">${tx.runningBalance.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">{tx.debit ? `PKR ${tx.debit.toFixed(2)}` : '-'}</TableCell>
+                        <TableCell className="text-right text-green-600">{tx.credit ? `PKR ${tx.credit.toFixed(2)}` : '-'}</TableCell>
+                        <TableCell className="text-right font-bold">PKR {tx.runningBalance.toFixed(2)}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

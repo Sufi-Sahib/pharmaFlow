@@ -121,7 +121,7 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
                             <CardDescription>Real-time credit status</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-bold text-blue-900">$5,400.00 <span className="text-sm font-normal text-muted-foreground">/ $15,000.00</span></p>
+                            <p className="text-2xl font-bold text-blue-900">PKR 540,000 <span className="text-sm font-normal text-muted-foreground">/ PKR 1,500,000</span></p>
                         </CardContent>
                     </Card>
 
@@ -181,8 +181,8 @@ function BookerSalesReturn({ goBack }: { goBack: () => void; }) {
                             <SelectValue placeholder="Select Original Invoice" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="inv-001">INV-001 - $450.00</SelectItem>
-                            <SelectItem value="inv-002">INV-002 - $1250.00</SelectItem>
+                            <SelectItem value="inv-001">INV-001 - PKR 45000.00</SelectItem>
+                            <SelectItem value="inv-002">INV-002 - PKR 125000.00</SelectItem>
                         </SelectContent>
                     </Select>
                     <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -217,4 +217,3 @@ export default function BookerPage() {
     </SidebarProvider>
   );
 }
-

@@ -1,5 +1,5 @@
 
-import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export const statsCards: StatCard[] = [
@@ -26,7 +26,7 @@ export const statsCards: StatCard[] = [
   },
   {
     title: "Platform Revenue",
-    value: "$45,231.89",
+    value: "PKR 45,231,890",
     change: "+20.1%",
     changeType: "increase",
     icon: BarChart,
@@ -36,47 +36,47 @@ export const statsCards: StatCard[] = [
 export const distributors: Distributor[] = [
   {
     id: "dist-01",
-    companyName: "MediSupply Co.",
+    companyName: "Faisalabad Medical Supplies",
     logoUrl: "https://picsum.photos/seed/logo1/100/100",
     status: "Pending",
     package: "Growth",
     joinedDate: "2023-10-15",
     bookers: { current: 4, max: 5 },
     deliveryStaff: { current: 8, max: 10 },
-    currentSales: 75000,
+    currentSales: 7500000,
   },
   {
     id: "dist-02",
-    companyName: "PharmaCare Inc.",
+    companyName: "Lahore Pharma Group",
     logoUrl: "https://picsum.photos/seed/logo2/100/100",
     status: "Approved",
     package: "Custom",
     joinedDate: "2023-01-20",
     bookers: { current: 10, max: 10 },
     deliveryStaff: { current: 18, max: 20 },
-    currentSales: 250000,
+    currentSales: 25000000,
   },
   {
     id: "dist-03",
-    companyName: "HealthLogistics",
+    companyName: "Kamalia Health Logistics",
     logoUrl: "https://picsum.photos/seed/logo3/100/100",
     status: "Approved",
     package: "Starter",
     joinedDate: "2023-09-01",
     bookers: { current: 1, max: 2 },
     deliveryStaff: { current: 3, max: 3 },
-    currentSales: 22000,
+    currentSales: 2200000,
   },
   {
     id: "dist-04",
-    companyName: "WellPack Pharma",
+    companyName: "Gojra WellPack Pharma",
     logoUrl: "https://picsum.photos/seed/logo4/100/100",
     status: "Suspended",
     package: "Starter",
     joinedDate: "2023-10-18",
     bookers: { current: 2, max: 2 },
     deliveryStaff: { current: 1, max: 3 },
-    currentSales: 15000,
+    currentSales: 1500000,
   },
 ];
 
@@ -88,10 +88,10 @@ export const sampleBid: Bid = {
     sku: "AML-5MG-T30",
   },
   customer: {
-    name: "City Clinic",
+    name: "Ali Clinic, TTS-City",
     avatarUrl: "https://picsum.photos/seed/avatar1/100/100",
   },
-  requestedPrice: 18.50,
+  requestedPrice: 1850,
   quantity: 500,
   status: "Requested",
 };
@@ -108,9 +108,9 @@ export const activeDeliveries: Delivery[] = [
     lastUpdate: "3m ago",
     progress: 75,
     itemsCount: 5,
-    amount: 1250.00,
+    amount: 125000,
     customer: "Wellness Pharmacy",
-    address: "456 Oak Ave"
+    address: "TTS-Jhang Road"
   },
   {
     id: "del-02",
@@ -123,9 +123,9 @@ export const activeDeliveries: Delivery[] = [
     lastUpdate: "15m ago",
     progress: 20,
     itemsCount: 3,
-    amount: 300.00,
+    amount: 30000,
     customer: "City Clinic",
-    address: "123 Main St",
+    address: "TTS-Gojara Road",
   },
   {
     id: "del-03",
@@ -138,16 +138,18 @@ export const activeDeliveries: Delivery[] = [
     lastUpdate: "1h ago",
     progress: 100,
     itemsCount: 8,
-    amount: 620.00,
+    amount: 62000,
     customer: "Southside Meds",
-    address: "321 Elm St"
+    address: "TTS-Shorkot Road"
   },
 ];
 
 export const customers = [
-    { name: "City Clinic", address: "123 Main St", status: "Order Taken" },
-    { name: "Wellness Pharmacy", address: "456 Oak Ave", status: "Pending" },
-    { name: "HealthFirst Meds", address: "789 Pine Ln", status: "Pending" },
+    { name: "Ali Clinic", address: "TTS-City", status: "Order Taken" },
+    { name: "Chenab Pharmacy", address: "Jhang", status: "Pending" },
+    { name: "Shorkot Medicos", address: "Shorkot Cantt", status: "Pending" },
+    { name: "Kamalia Dispensary", address: "Kamalia", status: "Pending" },
+    { name: "Gojra Medical Store", address: "Gojra", status: "Pending" },
 ];
 
 export const productsWithBatches: Product[] = [
@@ -155,7 +157,7 @@ export const productsWithBatches: Product[] = [
         name: "Amlodipine 5mg",
         category: "Cardiovascular",
         imageUrl: "https://picsum.photos/seed/product1/200/200",
-        price: 20.00,
+        price: 2000,
         inStock: true,
         stock: 250,
         batches: [
@@ -167,7 +169,7 @@ export const productsWithBatches: Product[] = [
         name: "Metformin 500mg",
         category: "Diabetes",
         imageUrl: "https://picsum.photos/seed/product2/200/200",
-        price: 15.75,
+        price: 1575,
         inStock: true,
         stock: 80,
         batches: [
@@ -178,7 +180,7 @@ export const productsWithBatches: Product[] = [
         name: "Atorvastatin 20mg",
         category: "Cardiovascular",
         imageUrl: "https://picsum.photos/seed/product3/200/200",
-        price: 35.50,
+        price: 3550,
         inStock: false,
         stock: 0,
         batches: []
@@ -186,6 +188,34 @@ export const productsWithBatches: Product[] = [
 ];
 
 export const salesReturns: SalesReturn[] = [
-  { id: "RTN-051", customer: "City Clinic", date: "2023-10-23", invoiceId: "INV-9872", amount: 150.00, status: "Pending" },
-  { id: "RTN-050", customer: "Wellness Pharmacy", date: "2023-10-21", invoiceId: "INV-9871", amount: 75.50, status: "Approved" },
+  { id: "RTN-051", customer: "Ali Clinic", date: "2023-10-23", invoiceId: "INV-9872", amount: 15000, status: "Pending" },
+  { id: "RTN-050", customer: "Chenab Pharmacy", date: "2023-10-21", invoiceId: "INV-9871", amount: 7550, status: "Approved" },
+];
+
+export const accountSummary: AccountSummary = {
+  customerName: "National Hospital, Faisalabad",
+  creditLimit: 15000000,
+  currentBalance: 4820500,
+  aging: {
+    current: 2500000,
+    '30-60': 1500500,
+    '60-90': 820000,
+    '90+': 0
+  }
+};
+
+export const invoices: Invoice[] = [
+    { id: "ORD-9872", date: "2023-10-22", dueDate: "2023-11-21", amount: 450000.00, status: "Paid" },
+    { id: "ORD-9871", date: "2023-10-21", dueDate: "2023-11-20", amount: 1250000.00, status: "Due in 15 days" },
+    { id: "ORD-9869", date: "2023-09-19", dueDate: "2023-10-19", amount: 820000.00, status: "Overdue by 34 days" },
+    { id: "ORD-9865", date: "2023-08-15", dueDate: "2023-09-14", amount: 720000.00, status: "Paid" },
+];
+
+export const transactions: Transaction[] = [
+     { id: "TRN-1234", date: "2023-10-25", description: "Payment for ORD-9872", type: 'Payment', credit: 450000, runningBalance: 4370500 },
+     { id: "CN-0012", date: "2023-10-24", description: "Credit Note for Return #RTN-050", type: 'Credit Note', credit: 150000, runningBalance: 4820500 },
+     { id: "INV-9872", date: "2023-10-22", description: "Invoice ORD-9872", type: 'Invoice', debit: 450000, runningBalance: 4970500 },
+     { id: "TRN-1233", date: "2023-09-18", description: "Payment for ORD-9865", type: 'Payment', credit: 720000, runningBalance: 4520500 },
+     { id: "INV-9880", date: "2023-11-01", description: "Invoice ORD-9880", type: 'Invoice', debit: 10000000, runningBalance: 14520500 },
+     { id: "INV-9881", date: "2023-11-02", description: "Invoice ORD-9881", type: 'Invoice', debit: 15000000, runningBalance: 29520500 },
 ];

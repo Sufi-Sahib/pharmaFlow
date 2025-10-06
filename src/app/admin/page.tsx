@@ -50,11 +50,11 @@ function DistributorCard({ distributor }: { distributor: (typeof distributors)[0
             <h4 className="font-semibold text-sm mb-2">Monthly Performance</h4>
             <div className="flex justify-between text-sm">
                 <span>Current Sales</span>
-                <span>${distributor.currentSales.toLocaleString()}</span>
+                <span>PKR {distributor.currentSales.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm mt-1 text-red-600 font-medium">
                 <span>Commission Charge</span>
-                <span>${commission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span>PKR {commission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
         </div>
       </CardContent>
