@@ -14,6 +14,11 @@ import {
   Gavel,
   AreaChart,
   Settings,
+  Shield,
+  User,
+  Truck,
+  BookUser,
+  Wallet,
 } from 'lucide-react';
 import { PharmaFlowLogo } from '@/components/icons';
 
@@ -31,30 +36,60 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/">
+            <Link href="/" passHref>
               <SidebarMenuButton tooltip="Dashboard">
                 <Home />
                 <span>Dashboard</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Distributors">
-              <Users />
-              <span>Distributors</span>
-            </SidebarMenuButton>
+           <SidebarMenuItem>
+            <Link href="/admin" passHref>
+              <SidebarMenuButton tooltip="Super Admin">
+                <Shield />
+                <span>Super Admin</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Packages">
-              <Package />
-              <span>Packages</span>
-            </SidebarMenuButton>
+            <Link href="/manager" passHref>
+              <SidebarMenuButton tooltip="Manager">
+                <Gavel />
+                <span>Manager</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <Link href="/customer" passHref>
+              <SidebarMenuButton tooltip="Customer">
+                <User />
+                <span>Customer</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Policies">
-              <Gavel />
-              <span>Policies</span>
-            </SidebarMenuButton>
+            <Link href="/booker" passHref>
+              <SidebarMenuButton tooltip="Booker">
+                <BookUser />
+                <span>Booker</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/delivery" passHref>
+              <SidebarMenuButton tooltip="Delivery">
+                <Truck />
+                <span>Delivery</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <Link href="/accounts" passHref>
+              <SidebarMenuButton tooltip="Accounts">
+                <Wallet />
+                <span>Accounts</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Analytics">

@@ -1,10 +1,19 @@
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
-import { ActiveDeliveries } from "@/components/dashboard/active-deliveries";
-import { BiddingOverview } from "@/components/dashboard/bidding-overview";
-import { DistributorRequests } from "@/components/dashboard/distributor-requests";
-import { StatsCards } from "@/components/dashboard/stats-cards";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+
+const roles = [
+    { name: "Super Admin", href: "/admin", description: "Manage distributors and platform settings." },
+    { name: "Manager", href: "/manager", description: "Oversee operations, bids, and approvals." },
+    { name: "Customer", href: "/customer", description: "Browse products and manage orders." },
+    { name: "Booker", href: "/booker", description: "Place new orders for customers." },
+    { name: "Delivery", href: "/delivery", description: "View and manage delivery tasks." },
+    { name: "Accounts", href: "/accounts", description: "View financial ledger and credit information." },
+]
 
 export default function Home() {
   return (
@@ -12,17 +21,33 @@ export default function Home() {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <main className="p-4 lg:p-6 space-y-6">
-          <StatsCards />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <DistributorRequests />
-            </div>
-            <div className="lg:col-span-1">
-              <BiddingOverview />
-            </div>
-          </div>
-          <ActiveDeliveries />
+        <main className="p-4 lg:p-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Welcome to PharmaFlow</CardTitle>
+                    <CardDescription>
+                        This is a multi-role application. Select a dashboard to view.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {roles.map((role) => (
+                        <Card key={role.name}>
+                            <CardHeader>
+                                <CardTitle>{role.name}</CardTitle>
+                                <CardDescription>{role.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Link href={role.href}>
+                                    <Button className="w-full">
+                                        <span>Go to Dashboard</span>
+                                        <ArrowRight className="ml-2" />
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </CardContent>
+            </Card>
         </main>
       </SidebarInset>
     </SidebarProvider>
