@@ -11,7 +11,7 @@ import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText } fro
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { activeDeliveries as deliveryTasks } from "@/lib/data";
+import { activeDeliveries } from "@/lib/data";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -29,7 +29,7 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
             <Card>
                 <CardHeader><CardTitle>Digital Delivery Challan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                    {deliveryTasks.sort((a,b) => a.status === 'Delivered' ? 1 : -1).map(task => (
+                    {activeDeliveries.sort((a,b) => a.status === 'Delivered' ? 1 : -1).map(task => (
                         <Card 
                             key={task.id} 
                             onClick={() => onSelectTask(task)} 

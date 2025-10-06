@@ -1,24 +1,14 @@
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import {
-  Invoice,
-  Transaction,
-  AccountSummary
-} from "@/lib/types";
-import { invoices, transactions, accountSummary } from "@/lib/data";
-
-const statusColors: { [key: string]: string } = {
-    Paid: "bg-green-100 text-green-800",
-    Overdue: "bg-red-100 text-red-800",
-}
+import { AlertTriangle } from "lucide-react";
+import { accountSummary, transactions } from "@/lib/data";
 
 function AgingBucket({ title, amount }: { title: string, amount: number }) {
   if (amount === 0) return null;
