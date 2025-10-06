@@ -7,19 +7,13 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, CheckCircle2, FileUp } from "lucide-react";
+import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-
-const deliveryTasks = [
-    { id: "ORD-9871", customer: "Wellness Pharmacy", address: "456 Oak Ave", amount: 1250.00, status: "Picked" },
-    { id: "ORD-9869", customer: "City Clinic", address: "123 Main St", amount: 300.00, status: "On the Way" },
-    { id: "ORD-9868", customer: "Southside Meds", address: "321 Elm St", amount: 620.00, status: "Pending" },
-    { id: "ORD-9867", customer: "North General", address: "999 Maple Dr", amount: 150.00, status: "Delivered" },
-];
-
-type TaskStatus = "Pending" | "Picked" | "On the Way" | "Delivered";
+import { deliveryTasks } from "@/lib/data";
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void }) {
     return (
@@ -33,7 +27,7 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
                 </CardContent>
             </Card>
             <Card>
-                <CardHeader><CardTitle>Task Feed</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Digital Delivery Challan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                     {deliveryTasks.sort((a,b) => a.status === 'Delivered' ? 1 : -1).map(task => (
                         <Card 
@@ -44,10 +38,11 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
                                 task.status === 'Delivered' && "bg-gray-50 opacity-60"
                             )}>
                             <CardContent className="p-4 flex items-center gap-4">
-                                {task.status === 'Delivered' ? <CheckCircle2 className="h-6 w-6 text-green-500" /> : <div className="h-6 w-6 bg-primary rounded-full" />}
+                                {task.status === 'Delivered' ? <CheckCircle2 className="h-6 w-6 text-green-500" /> : <Truck className="h-6 w-6 text-primary" />}
                                 <div className="flex-grow">
                                     <p className={cn("font-semibold", task.status === 'Delivered' && "line-through")}>{task.customer}</p>
                                     <p className="text-sm text-muted-foreground">{task.address}</p>
+                                    <p className="text-xs text-muted-foreground">{task.itemsCount} items</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="font-semibold">${task.amount.toFixed(2)}</p>
@@ -64,6 +59,7 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
 
 function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => void }) {
     const [isConfirmed, setIsConfirmed] = useState(false);
+    const [isReturning, setIsReturning] = useState(false);
 
     if (isConfirmed) {
         return (
@@ -76,32 +72,60 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
         )
     }
 
+    if (isReturning) {
+        return (
+             <Card className="max-w-lg mx-auto">
+                <CardHeader>
+                    <CardTitle>On-Spot Sales Return</CardTitle>
+                    <CardDescription>For Order ID: {task.id}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-4 border p-2 rounded-lg">
+                            <div>
+                                <p className="font-semibold">Amoxicillin 250mg</p>
+                                <p className="text-sm text-muted-foreground">Delivered: 20</p>
+                            </div>
+                            <Input type="number" placeholder="Return Qty" className="w-24" />
+                        </div>
+                    </div>
+                    <Textarea placeholder="Reason for return..." />
+                </CardContent>
+                 <CardFooter className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsReturning(false)} className="w-full">Cancel</Button>
+                    <Button onClick={() => { setIsReturning(false); setIsConfirmed(true); }} className="w-full">Confirm Return</Button>
+                </CardFooter>
+            </Card>
+        )
+    }
+
+
     return (
         <Card className="max-w-lg mx-auto">
             <CardHeader>
                 <CardTitle>Collect Payment: {task.customer}</CardTitle>
-                <CardDescription>Order ID: {task.id}</CardDescription>
+                <CardDescription>Order ID: {task.id} | Items: {task.itemsCount}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="text-center bg-muted p-6 rounded-lg">
                     <p className="text-muted-foreground">Total Amount Due</p>
                     <p className="text-5xl font-bold font-headline">${task.amount.toFixed(2)}</p>
                 </div>
+                 <Button variant="outline" className="w-full" onClick={() => setIsReturning(true)}>
+                    <Undo2 className="mr-2" /> Initiate On-Spot Return
+                </Button>
                 <div className="space-y-4">
+                     <p className="font-semibold text-center">Select Payment Method</p>
                      <RadioGroup defaultValue="cash" onValueChange={() => setIsConfirmed(true)}>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="cash" id="cash" />
-                            <Label htmlFor="cash" className="flex-grow text-base">Mark as Cash Received</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="gateway" id="gateway" />
-                            <Label htmlFor="gateway" className="flex-grow text-base">Confirm Gateway Paid</Label>
+                            <Label htmlFor="cash" className="flex-grow text-base">Mark as Full Cash Received</Label>
                         </div>
                     </RadioGroup>
                     <div className="relative border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                        <FileUp className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
-                        <p className="font-semibold">Upload Payment Slip</p>
-                        <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
+                        <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                        <p className="font-semibold">Upload Cheque Image</p>
+                        <p className="text-sm text-muted-foreground">For partial or full payment</p>
                         <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={() => setIsConfirmed(true)} />
                     </div>
                 </div>

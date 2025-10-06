@@ -36,9 +36,13 @@ export type Delivery = {
     name: string;
     avatarUrl: string;
   };
-  status: "Picked" | "On the way" | "Delivered" | "Delayed";
+  status: "Pending" | "Picked" | "On the way" | "Delivered" | "Delayed";
   lastUpdate: string;
   progress: number;
+  itemsCount: number;
+  amount: number;
+  customer: string;
+  address: string;
 };
 
 export type StatCard = {
@@ -48,3 +52,58 @@ export type StatCard = {
   changeType?: "increase" | "decrease";
   icon: LucideIcon;
 };
+
+export type ProductBatch = {
+  batchNumber: string;
+  expiryDate: string;
+  stock: number;
+}
+
+export type Product = {
+  name: string;
+  category: string;
+  imageUrl: string;
+  price: number;
+  inStock: boolean;
+  stock: number;
+  batches: ProductBatch[];
+};
+
+export type SalesReturn = {
+  id: string;
+  customer: string;
+  date: string;
+  invoiceId: string;
+  amount: number;
+  status: "Pending" | "Approved" | "Rejected";
+}
+
+export type AccountSummary = {
+  customerName: string;
+  creditLimit: number;
+  currentBalance: number;
+  aging: {
+    current: number;
+    '30-60': number;
+    '60-90': number;
+    '90+': number;
+  }
+}
+
+export type Invoice = {
+  id: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  status: "Paid" | "Due in 15 days" | "Overdue by 34 days";
+}
+
+export type Transaction = {
+  id: string;
+  date: string;
+  description: string;
+  type: "Invoice" | "Payment" | "Credit Note";
+  debit?: number;
+  credit?: number;
+  runningBalance: number;
+}

@@ -7,36 +7,16 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { sampleBid } from "@/lib/data";
+import { sampleBid, productsWithBatches as products, salesReturns } from "@/lib/data";
 import Image from "next/image";
-import { ShoppingCart, Tag, Search, Bell } from "lucide-react";
+import { ShoppingCart, Tag, Search, Bell, Undo2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-const products = [
-    {
-        name: "Amlodipine 5mg",
-        category: "Cardiovascular",
-        imageUrl: "https://picsum.photos/seed/product1/200/200",
-        price: 20.00,
-        inStock: true
-    },
-    {
-        name: "Metformin 500mg",
-        category: "Diabetes",
-        imageUrl: "https://picsum.photos/seed/product2/200/200",
-        price: 15.75,
-        inStock: true
-    },
-    {
-        name: "Atorvastatin 20mg",
-        category: "Cardiovascular",
-        imageUrl: "https://picsum.photos/seed/product3/200/200",
-        price: 35.50,
-        inStock: false
-    },
-];
 
 function ProductCard({ product }: { product: (typeof products)[0] }) {
     return (
@@ -48,8 +28,36 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
                 </div>
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-muted-foreground">${product.price.toFixed(2)}</p>
+                 <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="link" size="sm" className="p-0 h-auto text-xs">View Batches</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Available Batches for {product.name}</DialogTitle>
+                        </DialogHeader>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Batch #</TableHead>
+                                    <TableHead>Expiry</TableHead>
+                                    <TableHead>Stock</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {product.batches.map(batch => (
+                                    <TableRow key={batch.batchNumber}>
+                                        <TableCell>{batch.batchNumber}</TableCell>
+                                        <TableCell>{batch.expiryDate}</TableCell>
+                                        <TableCell>{batch.stock}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </DialogContent>
+                </Dialog>
             </CardContent>
-            <CardFooter className="flex gap-2 p-4 pt-0">
+            <CardFooter className="flex gap-2 p-4 pt-2">
                 <Dialog>
                     <DialogTrigger asChild>
                          <Button variant="outline" size="sm" className="w-full">
@@ -88,6 +96,8 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
 }
 
 function B2BPortal() {
+    const [view, setView] = useState('products');
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-3 space-y-6">
@@ -105,27 +115,35 @@ function B2BPortal() {
                                 </Button>
                             </div>
                         </div>
-                        <div className="flex gap-2 pt-4">
+                         <div className="flex gap-2 pt-4">
                             <div className="relative flex-1">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input placeholder="Search products..." className="pl-8" />
                             </div>
+                            <Button variant={view === 'products' ? 'secondary' : 'outline'} onClick={() => setView('products')}>Products</Button>
+                            <Button variant={view === 'returns' ? 'secondary' : 'outline'} onClick={() => setView('returns')}>My Returns</Button>
                         </div>
                     </CardHeader>
                 </Card>
-                 <Card>
-                    <CardHeader>
-                        <CardTitle>Products</CardTitle>
-                        <div className="flex gap-2 pt-2">
-                            <Button variant="secondary">Cardiovascular</Button>
-                            <Button variant="outline">Diabetes</Button>
-                             <Button variant="outline">Antibiotics</Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                        {products.map(p => <ProductCard key={p.name} product={p} />)}
-                    </CardContent>
-                </Card>
+                 
+                 {view === 'products' ? (
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Products</CardTitle>
+                            <div className="flex gap-2 pt-2">
+                                <Button variant="secondary">Cardiovascular</Button>
+                                <Button variant="outline">Diabetes</Button>
+                                <Button variant="outline">Antibiotics</Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            {products.map(p => <ProductCard key={p.name} product={p} />)}
+                        </CardContent>
+                    </Card>
+                 ) : (
+                    <SalesReturnView />
+                 )}
+                 
             </div>
             <div className="lg:col-span-1 space-y-6">
                 <Card>
@@ -172,6 +190,71 @@ function B2BPortal() {
             </div>
         </div>
     );
+}
+
+function SalesReturnView() {
+    return (
+        <Card>
+            <CardHeader className="flex-row items-center justify-between">
+                <CardTitle>My Sales Returns</CardTitle>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button><Undo2 className="mr-2 h-4 w-4" /> Request New Return</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Request a Sales Return</DialogTitle>
+                            <DialogDescription>Select the invoice and products you wish to return.</DialogDescription>
+                        </DialogHeader>
+                         <div className="grid gap-4 py-4">
+                            <Select>
+                                <SelectTrigger><SelectValue placeholder="Select an Invoice" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="inv-001">INV-001</SelectItem>
+                                    <SelectItem value="inv-002">INV-002</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-sm font-medium">Select products to return:</p>
+                             <div className="space-y-2">
+                                <div className="flex items-center justify-between gap-4 border p-2 rounded-lg">
+                                    <div>
+                                        <p className="font-semibold">Amlodipine 5mg</p>
+                                        <p className="text-sm text-muted-foreground">Purchased: 50</p>
+                                    </div>
+                                    <Input type="number" placeholder="Return Qty" className="w-24" />
+                                </div>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button>Submit Return Request</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Return ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Invoice ID</TableHead>
+                            <TableHead>Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {salesReturns.map(r => (
+                            <TableRow key={r.id}>
+                                <TableCell>{r.id}</TableCell>
+                                <TableCell>{r.date}</TableCell>
+                                <TableCell>{r.invoiceId}</TableCell>
+                                <TableCell><Badge variant={r.status === 'Approved' ? 'default' : 'secondary'}>{r.status}</Badge></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    )
 }
 
 export default function CustomerPage() {

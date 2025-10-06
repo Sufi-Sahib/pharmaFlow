@@ -1,5 +1,5 @@
 
-import type { Distributor, Bid, Delivery, StatCard } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export const statsCards: StatCard[] = [
@@ -107,6 +107,10 @@ export const activeDeliveries: Delivery[] = [
     status: "On the way",
     lastUpdate: "3m ago",
     progress: 75,
+    itemsCount: 5,
+    amount: 1250.00,
+    customer: "Wellness Pharmacy",
+    address: "456 Oak Ave"
   },
   {
     id: "del-02",
@@ -118,6 +122,10 @@ export const activeDeliveries: Delivery[] = [
     status: "Picked",
     lastUpdate: "15m ago",
     progress: 20,
+    itemsCount: 3,
+    amount: 300.00,
+    customer: "City Clinic",
+    address: "123 Main St",
   },
   {
     id: "del-03",
@@ -129,5 +137,55 @@ export const activeDeliveries: Delivery[] = [
     status: "Delivered",
     lastUpdate: "1h ago",
     progress: 100,
+    itemsCount: 8,
+    amount: 620.00,
+    customer: "Southside Meds",
+    address: "321 Elm St"
   },
+];
+
+export const customers = [
+    { name: "City Clinic", address: "123 Main St", status: "Order Taken" },
+    { name: "Wellness Pharmacy", address: "456 Oak Ave", status: "Pending" },
+    { name: "HealthFirst Meds", address: "789 Pine Ln", status: "Pending" },
+];
+
+export const productsWithBatches: Product[] = [
+    {
+        name: "Amlodipine 5mg",
+        category: "Cardiovascular",
+        imageUrl: "https://picsum.photos/seed/product1/200/200",
+        price: 20.00,
+        inStock: true,
+        stock: 250,
+        batches: [
+            { batchNumber: "A123", expiryDate: "2024-12-31", stock: 100 },
+            { batchNumber: "A124", expiryDate: "2025-06-30", stock: 150 }
+        ]
+    },
+    {
+        name: "Metformin 500mg",
+        category: "Diabetes",
+        imageUrl: "https://picsum.photos/seed/product2/200/200",
+        price: 15.75,
+        inStock: true,
+        stock: 80,
+        batches: [
+            { batchNumber: "M456", expiryDate: "2024-08-31", stock: 80 }
+        ]
+    },
+    {
+        name: "Atorvastatin 20mg",
+        category: "Cardiovascular",
+        imageUrl: "https://picsum.photos/seed/product3/200/200",
+        price: 35.50,
+        inStock: false,
+        stock: 0,
+        batches: []
+    },
+];
+
+export const salesReturns: SalesReturn[] = [
+  { id: "RTN-051", customer: "City Clinic", date: "2023-10-23", invoiceId: "INV-9872", amount: 150.00, status: "Pending" },
+  { id: "RTN-050", customer: "Wellness Pharmacy", date: "2023-10-21", invoiceId: "INV-9871", amount: 75.50, status: "Approved" },
 ];
