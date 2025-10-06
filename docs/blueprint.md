@@ -4,7 +4,14 @@
 
 - Super Admin Dashboard: Platform-wide view for super admins to approve distributors, manage packages, and set global policies.
 - Distributor Onboarding: Streamlined onboarding process for distributors, including application submission, document upload, and KYC/compliance checks.
-- Role-Based Access Control (RBAC): Enforce permissions based on user roles (Super Admin, Admin, Manager, Booker, Delivery, Accountant, Customer, Viewer/Auditor) to control access to features and data.
+- Role-Based Access Control (RBAC): Enforce permissions based on user roles to control access to features and data.
+  - Super Admin (Platform): Approves distributor admins & assigns package. Sets global policies (KYC, bidding rules, audit retention). Views platform-wide metrics; no access to tenant data content.
+  - Admin (Distributor Owner): Manages catalog, customers, users, routes, credit limits.
+  - Manager (optional): Limited admin (pricing approvals, dispatch).
+  - Booker: Orders on behalf of assigned customers; route check-in/out.
+  - Delivery: Receives tasks, navigates, updates status, records payments.
+  - Accountant: Ledgers, receipts, ageing, limit changes (policy-gated).
+  - Customer: Portal ordering, bids, invoices, own-ledger view.
 - Bidding System: AI-powered system suggesting counter prices. Admins and managers are able to set the price based on rules for bids, and a 'tool' will estimate minimum margin, tier rules, and user roles.
 - Offline Ordering and Delivery: Offline capabilities for bookers and delivery personnel to save drafts, capture data, and sync later, with conflict resolution.
 - GPS Tracking and Evidence: Automatic capture of latitude/longitude on key actions (check-in/out, order submit, delivery status, payment mark) for accountability and dispute resolution.
