@@ -1,12 +1,16 @@
+
 import type { LucideIcon } from "lucide-react";
 
 export type Distributor = {
   id: string;
   companyName: string;
   logoUrl: string;
-  status: "Pending" | "Approved" | "Rejected";
+  status: "Pending" | "Approved" | "Rejected" | "Suspended";
   package: "Starter" | "Growth" | "Custom";
   joinedDate: string;
+  bookers: { current: number; max: number };
+  deliveryStaff: { current: number; max: number };
+  currentSales: number;
 };
 
 export type Bid = {

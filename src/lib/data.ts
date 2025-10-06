@@ -1,5 +1,6 @@
+
 import type { Distributor, Bid, Delivery, StatCard } from "@/lib/types";
-import { Users, Package, Clock, BarChart, PackageCheck, AlertTriangle } from "lucide-react";
+import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export const statsCards: StatCard[] = [
   {
@@ -40,6 +41,9 @@ export const distributors: Distributor[] = [
     status: "Pending",
     package: "Growth",
     joinedDate: "2023-10-15",
+    bookers: { current: 4, max: 5 },
+    deliveryStaff: { current: 8, max: 10 },
+    currentSales: 75000,
   },
   {
     id: "dist-02",
@@ -48,6 +52,9 @@ export const distributors: Distributor[] = [
     status: "Approved",
     package: "Custom",
     joinedDate: "2023-01-20",
+    bookers: { current: 10, max: 10 },
+    deliveryStaff: { current: 18, max: 20 },
+    currentSales: 250000,
   },
   {
     id: "dist-03",
@@ -56,14 +63,20 @@ export const distributors: Distributor[] = [
     status: "Approved",
     package: "Starter",
     joinedDate: "2023-09-01",
+    bookers: { current: 1, max: 2 },
+    deliveryStaff: { current: 3, max: 3 },
+    currentSales: 22000,
   },
   {
     id: "dist-04",
     companyName: "WellPack Pharma",
     logoUrl: "https://picsum.photos/seed/logo4/100/100",
-    status: "Pending",
+    status: "Suspended",
     package: "Starter",
     joinedDate: "2023-10-18",
+    bookers: { current: 2, max: 2 },
+    deliveryStaff: { current: 1, max: 3 },
+    currentSales: 15000,
   },
 ];
 
