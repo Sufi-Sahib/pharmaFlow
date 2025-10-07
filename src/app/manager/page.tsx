@@ -10,14 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
-import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData } from "@/lib/data";
+import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit } from "lucide-react";
+import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 
 const summaryData = {
@@ -37,6 +38,79 @@ const statusColors: { [key: string]: string } = {
     Approved: "bg-green-100 text-green-800",
     "Due in 15 days": "bg-yellow-100 text-yellow-800",
     "Overdue by 34 days": "bg-red-100 text-red-800",
+}
+
+function OrderFulfillmentCard() {
+    const { toast } = useToast();
+    const bookerSourcedOrders = newOrders.filter(o => o.booker !== 'Direct');
+    const customerSourcedOrders = newOrders.filter(o => o.booker === 'Direct');
+
+    const handleAssign = (orderId: string) => {
+        toast({
+            title: "Order Assigned",
+            description: `Order ${orderId} has been assigned for delivery.`
+        });
+    }
+
+    const handleEdit = (orderId: string) => {
+        toast({
+            title: "Edit Order",
+            description: `Opening editor for order ${orderId}.`
+        });
+    }
+
+    const OrderList = ({ orders }: { orders: Order[] }) => (
+         <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Order ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {orders.map(order => (
+                    <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell className="text-right">PKR {order.amount.toLocaleString()}</TableCell>
+                        <TableCell className="text-right space-x-2">
+                             <Button variant="outline" size="sm" onClick={() => handleEdit(order.id)}>
+                                <Edit className="mr-2 h-4 w-4" /> Edit
+                            </Button>
+                            <Button size="sm" onClick={() => handleAssign(order.id)}>
+                                <Truck className="mr-2 h-4 w-4" /> Assign
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    );
+
+    return (
+        <Card className="col-span-1 lg:col-span-3">
+             <CardHeader>
+                <CardTitle>New Order Fulfillment</CardTitle>
+                <CardDescription>Review, edit, and assign new orders for delivery.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue="booker">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="booker">Booker Orders ({bookerSourcedOrders.length})</TabsTrigger>
+                        <TabsTrigger value="customer">Customer Orders ({customerSourcedOrders.length})</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="booker">
+                        <OrderList orders={bookerSourcedOrders} />
+                    </TabsContent>
+                    <TabsContent value="customer">
+                        <OrderList orders={customerSourcedOrders} />
+                    </TabsContent>
+                </Tabs>
+            </CardContent>
+        </Card>
+    );
 }
 
 function OrdersDetailView({ onAreaClick, onCustomerClick, onBookerClick }: { onAreaClick: (area: string) => void, onCustomerClick: (customer: string) => void, onBookerClick: (booker: string) => void }) {
@@ -365,6 +439,16 @@ function InvoicesDetailView({ onInvoiceClick, filter }: { onInvoiceClick: (order
 }
 
 function SalesReturnListView({ onReturnClick }: { onReturnClick: (returnId: string) => void }) {
+    const { toast } = useToast();
+    
+    const handleApprove = (e: React.MouseEvent, returnId: string) => {
+        e.stopPropagation();
+        toast({
+            title: "Return Approved",
+            description: `Sales return ${returnId} has been approved.`
+        });
+    }
+
     return (
         <Table>
           <TableHeader>
@@ -384,7 +468,7 @@ function SalesReturnListView({ onReturnClick }: { onReturnClick: (returnId: stri
                 <TableCell>PKR {r.amount.toFixed(2)}</TableCell>
                 <TableCell><Badge className={statusColors[r.status]}>{r.status}</Badge></TableCell>
                 <TableCell className="text-right">
-                  {r.status === 'Pending' && <Button size="sm" onClick={(e) => e.stopPropagation()}>Approve</Button>}
+                  {r.status === 'Pending' && <Button size="sm" onClick={(e) => handleApprove(e, r.id)}>Approve</Button>}
                   {r.status === 'Approved' && <span className="text-green-600 font-semibold flex items-center justify-end"><CheckCircle2 className="mr-1 h-4 w-4" /> Done</span>}
                 </TableCell>
               </TableRow>
@@ -672,6 +756,10 @@ function AdminDashboard() {
         </Collapsible>
       </div>
 
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <OrderFulfillmentCard />
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <BiddingOverview />
 
@@ -715,6 +803,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
-
 
     

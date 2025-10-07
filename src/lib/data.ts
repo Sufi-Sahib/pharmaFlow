@@ -352,6 +352,14 @@ const productPerformance = [
     { name: "Ciprofloxacin 500mg", value: 43000, previousValue: 42000 },
 ];
 
+export const newOrders: Order[] = [
+    { id: "ORD-9885", customer: "City Hospital", booker: "Ali Khan", amount: 250000.00, status: "Processing" },
+    { id: "ORD-9884", customer: "Wellness Pharmacy", booker: "Fatima Ahmed", amount: 75000.00, status: "Processing" },
+    { id: "ORD-9883", customer: "Hope Clinic", booker: "Direct", amount: 120000.00, status: "Processing" },
+    { id: "ORD-9882", customer: "Crescent Medicos", booker: "Ali Khan", amount: 32000.00, status: "Processing" },
+];
+
+
 export const adminAnalyticsData = {
     '7d': {
         totalRevenue: createComparativeMetric(890000, 750000),
@@ -412,5 +420,7 @@ export const superAdminAnalyticsData = {
         salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales * 12, previousValue: d.currentSales * 12 * 0.9 })),
     }
 }
+
+    
 
     
