@@ -181,6 +181,16 @@ function CustomerLedgerCard({ onInvoiceClick }: { onInvoiceClick: (invoiceId: st
 
 function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
     const { toast } = useToast();
+    const [isBidding, setIsBidding] = useState(false);
+
+    const handleBidSubmit = () => {
+        toast({
+            title: "Bid Submitted",
+            description: `Your price request for ${product.name} has been sent.`
+        });
+        setIsBidding(false);
+    }
+
     return (
         <Card className="flex flex-col">
             <CardContent className="p-4 flex-grow">
@@ -228,49 +238,44 @@ function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
                     </div>
                 )}
             </CardContent>
-            <CardFooter className="flex gap-2 p-4 pt-2">
-                <Dialog>
-                    <DialogTrigger asChild>
-                         <Button variant="outline" size="sm" className="w-full">
-                            <Tag className="mr-2 h-4 w-4" /> Request Price
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Request a Price for {product.name}</DialogTitle>
-                            <DialogDescription>
-                                Submit your desired price and a reason for the request. An admin will review it shortly.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="desiredPrice" className="text-right">Desired Price</Label>
-                                <Input id="desiredPrice" type="number" className="col-span-3" placeholder="PKR 1800.00" defaultValue={product.lastOrder?.price.toFixed(2)} />
+            <CardFooter className="flex flex-col gap-2 p-4 pt-2">
+                {isBidding ? (
+                    <div className="w-full space-y-2">
+                        <div className="flex gap-2">
+                            <div className="flex-1 space-y-1">
+                                <Label htmlFor="desiredPrice" className="text-xs">Your Price</Label>
+                                <Input id="desiredPrice" type="number" placeholder="Price" defaultValue={product.lastOrder?.price.toFixed(2)} className="h-9"/>
                             </div>
-                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="reason" className="text-right">Reason</Label>
-                                <Textarea id="reason" className="col-span-3" placeholder="e.g., Matching a competitor's price" />
+                            <div className="flex-1 space-y-1">
+                                <Label htmlFor="quantity" className="text-xs">Quantity</Label>
+                                <Input id="quantity" type="number" placeholder="Qty" className="h-9"/>
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button type="submit">Submit Bid</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-                
-                <Button 
-                    size="sm" 
-                    className="w-full" 
-                    disabled={!product.inStock}
-                    onClick={() => {
-                        toast({
-                            title: "Added to Cart",
-                            description: `${product.name} has been added to your cart.`
-                        })
-                    }}
-                >
-                     {product.inStock ? <><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</> : 'Out of Stock'}
-                </Button>
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="w-full" onClick={() => setIsBidding(false)}>Cancel</Button>
+                            <Button size="sm" className="w-full" onClick={handleBidSubmit}>Submit Bid</Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex gap-2 w-full">
+                         <Button variant="outline" size="sm" className="w-full" onClick={() => setIsBidding(true)}>
+                            <Tag className="mr-2 h-4 w-4" /> Request Price
+                        </Button>
+                        <Button 
+                            size="sm" 
+                            className="w-full" 
+                            disabled={!product.inStock}
+                            onClick={() => {
+                                toast({
+                                    title: "Added to Cart",
+                                    description: `${product.name} has been added to your cart.`
+                                })
+                            }}
+                        >
+                            {product.inStock ? <><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</> : 'Out of Stock'}
+                        </Button>
+                    </div>
+                )}
             </CardFooter>
         </Card>
     )
@@ -588,3 +593,5 @@ export default function CustomerPage() {
         </SidebarProvider>
     );
 }
+
+    
