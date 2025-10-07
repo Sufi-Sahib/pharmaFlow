@@ -7,25 +7,25 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText } from "lucide-react";
+import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText, LocateFixed } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { activeDeliveries } from "@/lib/data";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void }) {
     return (
-        <div className="grid lg:grid-cols-2 gap-6">
-            <Card>
-                <CardHeader><CardTitle>Live Map Navigation</CardTitle></CardHeader>
-                <CardContent>
-                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                        <Map className="h-16 w-16 text-muted-foreground" />
-                    </div>
-                </CardContent>
-            </Card>
+        <div className="space-y-6">
+            <Alert>
+                <LocateFixed className="h-4 w-4" />
+                <AlertTitle>Action-Based Location</AlertTitle>
+                <AlertDescription>
+                    We capture a one-time location stamp when you confirm a payment. We do not track you in the background.
+                </AlertDescription>
+            </Alert>
             <Card>
                 <CardHeader><CardTitle>Digital Delivery Challan</CardTitle></CardHeader>
                 <CardContent className="space-y-4">

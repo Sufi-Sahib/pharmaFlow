@@ -1,21 +1,41 @@
 
 "use client";
-import { useState } from "react";
+import { useState }from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Map, MapPin, Search, Wifi, WifiOff, AlertTriangle, Undo2, PlusCircle, MinusCircle } from "lucide-react";
+import { MapPin, Search, Wifi, WifiOff, AlertTriangle, Undo2, PlusCircle, MinusCircle, LocateFixed } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { customers, productsWithBatches as products } from "@/lib/data";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useGeoLocation } from "@/hooks/use-geo-location";
+import { useToast } from "@/hooks/use-toast";
 
 function BookerHome() {
   const [view, setView] = useState("home");
+  const { toast } = useToast();
+  const { location, error, getLocation } = useGeoLocation();
+
+  const handleCheckIn = () => {
+    getLocation();
+    if (error) {
+      toast({ title: "Location Error", description: error, variant: "destructive" });
+    } else {
+      // In a real app, this would be sent to the server.
+      toast({ title: "Checked In!", description: `Stamped at: ${location?.latitude}, ${location?.longitude}` });
+    }
+  }
+
+  const handleCheckOut = () => {
+     // In a real app, this would be sent to the server.
+    toast({ title: "Checked Out!", description: "Route concluded." });
+  }
   
   const handleViewChange = (newView: string) => setView(newView);
 
@@ -33,18 +53,24 @@ function BookerHome() {
               <Button size="lg" onClick={() => handleViewChange('order')}>New Order</Button>
               <Button size="lg" variant="outline" onClick={() => handleViewChange('return')}><Undo2 className="mr-2" />Initiate Return</Button>
             </div>
-            <Card>
+             <Card>
                 <CardHeader>
-                    <CardTitle>Live GPS Tracking</CardTitle>
+                    <CardTitle>Action-Based Geo-Stamping</CardTitle>
+                    <CardDescription>Capture location for key events.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                     <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                        <Map className="h-16 w-16 text-muted-foreground" />
-                    </div>
+                     <Alert>
+                        <LocateFixed className="h-4 w-4" />
+                        <AlertTitle>Location Stamping</AlertTitle>
+                        <AlertDescription>
+                          We capture a one-time location stamp for actions like checking in. We don’t track you in the background.
+                        </AlertDescription>
+                    </Alert>
                     <div className="flex gap-2">
-                        <Button className="w-full" variant="outline">Check-In</Button>
-                        <Button className="w-full" variant="outline">Check-Out</Button>
+                        <Button className="w-full" variant="outline" onClick={handleCheckIn}>Check-In (Stamp Location)</Button>
+                        <Button className="w-full" variant="outline" onClick={handleCheckOut}>Check-Out</Button>
                     </div>
+                    {location && <p className="text-xs text-center text-muted-foreground">Last stamp: {location.latitude}, {location.longitude}</p>}
                 </CardContent>
             </Card>
         </div>
