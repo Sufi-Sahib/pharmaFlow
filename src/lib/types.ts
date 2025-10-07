@@ -67,6 +67,11 @@ export type Product = {
   inStock: boolean;
   stock: number;
   batches: ProductBatch[];
+  lastOrder?: {
+      quantity: number;
+      date: string;
+      price: number;
+  }
 };
 
 export type SalesReturn = {

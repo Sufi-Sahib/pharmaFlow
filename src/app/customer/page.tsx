@@ -9,19 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { sampleBid, productsWithBatches as products, salesReturns } from "@/lib/data";
 import Image from "next/image";
-import { ShoppingCart, Tag, Search, Bell, Undo2 } from "lucide-react";
+import { ShoppingCart, Tag, Search, Bell, Undo2, History, FileText, PlusCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { useGeoLocation } from "@/hooks/use-geo-location";
 
 
 function ProductCard({ product }: { product: (typeof products)[0] }) {
     return (
-        <Card>
-            <CardContent className="p-4">
+        <Card className="flex flex-col">
+            <CardContent className="p-4 flex-grow">
                 <div className="relative">
                     <Image src={product.imageUrl} alt={product.name} width={200} height={200} className="w-full h-32 object-cover rounded-md mb-4" data-ai-hint="medicine box" />
                     <Badge variant="secondary" className="absolute top-2 left-2">{product.category}</Badge>
@@ -56,6 +58,12 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
                         </Table>
                     </DialogContent>
                 </Dialog>
+                {product.lastOrder && (
+                    <div className="mt-2 text-xs text-muted-foreground bg-gray-50 p-2 rounded-md border">
+                        <p className="font-semibold flex items-center gap-1"><History className="h-3 w-3"/>Last Order:</p>
+                        <span>{product.lastOrder.quantity} units on {product.lastOrder.date} at PKR {product.lastOrder.price.toFixed(2)}</span>
+                    </div>
+                )}
             </CardContent>
             <CardFooter className="flex gap-2 p-4 pt-2">
                 <Dialog>
@@ -95,6 +103,85 @@ function ProductCard({ product }: { product: (typeof products)[0] }) {
     )
 }
 
+function RequestProductDialog() {
+    const { toast } = useToast();
+    const { stampAction } = useGeoLocation();
+
+    const handleRequestSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const productData = {
+            name: formData.get('productName'),
+            quantity: formData.get('quantity'),
+            targetPrice: formData.get('targetPrice'),
+            // Image handling would be more complex in a real app
+        };
+
+        if (!productData.name || !productData.quantity || !productData.targetPrice) {
+            toast({ title: "Missing Information", description: "Please fill out all fields.", variant: "destructive"});
+            return;
+        }
+
+        const result = await stampAction('product_request', productData);
+
+        if (result.status === 'queued') {
+            toast({ title: "Offline", description: "Product request saved locally and will be synced when online." });
+        } else if (result.status === 'success') {
+            toast({ title: "Request Submitted!", description: "Your product request has been submitted for review." });
+        } else {
+            toast({ title: "Sync Error", description: "Could not submit request. It has been queued for later.", variant: "destructive" });
+        }
+        
+        // Find the dialog close button and click it to close the modal
+        // This is a workaround for not having direct control over the dialog's open state here
+        document.getElementById('close-request-product-dialog')?.click();
+    }
+    
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline"><PlusCircle className="mr-2 h-4 w-4" /> Request a Product</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <form onSubmit={handleRequestSubmit}>
+                    <DialogHeader>
+                        <DialogTitle>Request a New Product</DialogTitle>
+                        <DialogDescription>
+                            Can't find what you're looking for? Request it here and we'll try to source it for you.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="productName" className="text-right">Product Name</Label>
+                            <Input id="productName" name="productName" className="col-span-3" placeholder="e.g., Paracetamol 500mg" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="quantity" className="text-right">Quantity</Label>
+                            <Input id="quantity" name="quantity" type="number" className="col-span-3" placeholder="e.g., 1000" />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="targetPrice" className="text-right">Target Price</Label>
+                            <Input id="targetPrice" name="targetPrice" type="number" className="col-span-3" placeholder="PKR 150.00" />
+                        </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                             <Label htmlFor="productImage" className="text-right">Image</Label>
+                            <div className="col-span-3 border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer">
+                                <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                                <p className="text-sm font-semibold">Upload Image</p>
+                                <input id="productImage" name="productImage" type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                            </div>
+                         </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="submit">Submit Request</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+
 function B2BPortal() {
     const [view, setView] = useState('products');
 
@@ -108,11 +195,14 @@ function B2BPortal() {
                                <CardTitle className="font-headline">Welcome, Ali Clinic!</CardTitle>
                                <CardDescription>Your dedicated B2B portal for all procurement needs.</CardDescription>
                             </div>
-                             <div className="relative">
-                                <Button variant="ghost" size="icon">
-                                    <ShoppingCart />
-                                    <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">3</Badge>
-                                </Button>
+                             <div className="flex items-center gap-2">
+                                <RequestProductDialog />
+                                <div className="relative">
+                                    <Button variant="ghost" size="icon">
+                                        <ShoppingCart />
+                                        <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">3</Badge>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                          <div className="flex gap-2 pt-4">

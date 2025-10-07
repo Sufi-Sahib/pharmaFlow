@@ -163,7 +163,12 @@ export const productsWithBatches: Product[] = [
         batches: [
             { batchNumber: "A123", expiryDate: "2024-12-31", stock: 100 },
             { batchNumber: "A124", expiryDate: "2025-06-30", stock: 150 }
-        ]
+        ],
+        lastOrder: {
+            quantity: 50,
+            date: "2023-09-15",
+            price: 1950,
+        }
     },
     {
         name: "Metformin 500mg",
@@ -183,7 +188,12 @@ export const productsWithBatches: Product[] = [
         price: 3550,
         inStock: false,
         stock: 0,
-        batches: []
+        batches: [],
+        lastOrder: {
+            quantity: 100,
+            date: "2023-08-20",
+            price: 3500,
+        }
     },
 ];
 
