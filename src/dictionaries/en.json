@@ -1,0 +1,12 @@
+{
+    "header_title": "Super Admin Dashboard",
+    "status_syncing": "Syncing offline data...",
+    "status_offline": "Offline. Actions are being queued.",
+    "status_error": "Syncing error. Please check connection.",
+    "status_online": "Online and synced.",
+    "language": "Language",
+    "user_menu_super_admin": "Super Admin",
+    "user_menu_settings": "Settings",
+    "user_menu_support": "Support",
+    "user_menu_logout": "Logout"
+}

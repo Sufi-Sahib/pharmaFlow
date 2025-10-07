@@ -1,0 +1,12 @@
+{
+    "header_title": "سپر ایڈمن ڈیش بورڈ",
+    "status_syncing": "آف لائن ڈیٹا کی مطابقت پذیری جاری ہے۔..",
+    "status_offline": "آف لائن۔ کارروائیاں قطار میں ہیں۔",
+    "status_error": "مطابقت پذیری میں خرابی۔ براہ کرم کنکشن چیک کریں۔",
+    "status_online": "آن لائن اور مطابقت پذیر۔",
+    "language": "زبان",
+    "user_menu_super_admin": "سپر ایڈمن",
+    "user_menu_settings": "ترتیبات",
+    "user_menu_support": "مدد",
+    "user_menu_logout": "لاگ آؤٹ"
+}

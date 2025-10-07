@@ -33,6 +33,15 @@ const nextConfig: NextConfig = {
   experimental: {
     // allowedDevOrigins is a top-level property, not inside experimental for this Next.js version
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/en',
+        permanent: true,
+      },
+    ]
+  },
   allowedDevOrigins: [
     "https://*.cloudworkstations.dev",
     "https://*.firebase.studio",
