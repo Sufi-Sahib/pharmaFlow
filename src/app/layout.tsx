@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/layout/providers';
-import { i18n } from '../../../i18n.config';
+import { i18n } from '../../i18n.config';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateStaticParams() {
   return i18n.locales.map(locale => ({ lang: locale }));
@@ -20,13 +21,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode;
   params: { lang: string };
 }>) {
+  const dictionary = await getDictionary(params.lang as 'en' | 'ur');
+
   return (
     <html lang={params.lang} dir={params.lang === 'ur' ? 'rtl' : 'ltr'}>
       <head>
@@ -47,7 +50,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png"></link>
       </head>
       <body className="font-body antialiased">
-        <Providers lang={params.lang}>{children}</Providers>
+        <Providers lang={params.lang} dictionary={dictionary}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

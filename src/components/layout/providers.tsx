@@ -3,18 +3,17 @@
 import { Toaster } from '@/components/ui/toaster';
 import { GeoProvider } from '@/context/geo-provider';
 import { I18nProvider } from '@/context/i18n-provider';
-import { getDictionary } from '@/lib/get-dictionary';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export function Providers({
   children,
   lang,
+  dictionary,
 }: {
   children: React.ReactNode;
   lang: string;
+  dictionary: any;
 }) {
-  const [dictionary, setDictionary] = useState<any | null>(null);
-
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
@@ -27,10 +26,6 @@ export function Providers({
         );
     }
   }, []);
-
-  useEffect(() => {
-    getDictionary(lang).then(setDictionary);
-  }, [lang]);
 
   if (!dictionary) return null;
 
