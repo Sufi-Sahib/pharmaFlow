@@ -1,3 +1,4 @@
+
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -14,6 +15,7 @@ const roles = [
     { name: "Delivery", href: "/delivery", description: "View and manage delivery tasks." },
     { name: "Accounts", href: "/accounts", description: "View financial ledger and credit information." },
     { name: "Audit History", href: "/audits", description: "View system audit logs." },
+    { name: "Analytics", href: "/analytics", description: "View business intelligence dashboards." },
 ]
 
 export default function Home() {

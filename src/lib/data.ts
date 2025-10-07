@@ -1,5 +1,5 @@
 
-import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export const statsCards: StatCard[] = [
@@ -145,11 +145,11 @@ export const activeDeliveries: Delivery[] = [
 ];
 
 export const customers = [
-    { name: "Ali Clinic", address: "TTS-City", status: "Order Taken" },
-    { name: "Chenab Pharmacy", address: "Jhang", status: "Pending" },
-    { name: "Shorkot Medicos", address: "Shorkot Cantt", status: "Pending" },
-    { name: "Kamalia Dispensary", address: "Kamalia", status: "Pending" },
-    { name: "Gojra Medical Store", address: "Gojra", status: "Pending" },
+    { name: "Ali Clinic", address: "TTS-City", status: "Order Taken", latitude: 30.77, longitude: 72.48 },
+    { name: "Chenab Pharmacy", address: "Jhang", status: "Pending", latitude: 31.27, longitude: 72.33 },
+    { name: "Shorkot Medicos", address: "Shorkot Cantt", status: "Pending", latitude: 30.85, longitude: 72.11 },
+    { name: "Kamalia Dispensary", address: "Kamalia", status: "Pending", latitude: 30.72, longitude: 72.64 },
+    { name: "Gojra Medical Store", address: "Gojra", status: "Pending", latitude: 31.15, longitude: 72.68 },
 ];
 
 export const productsWithBatches: Product[] = [
@@ -238,3 +238,47 @@ export const auditLogs: AuditLog[] = [
     { id: '4', timestamp: '2023-10-26 10:15:00', user: 'Kamran', role: 'Super Admin', action: 'Distributor Added', details: 'New distributor "Pharma Solutions" added', status: 'Success' },
     { id: '5', timestamp: '2023-10-26 10:20:00', user: 'Ali Clinic', role: 'Customer', action: 'Sales Return Request', details: 'Sales return requested for Invoice #INV-9872', status: 'Pending' },
 ];
+
+export const analyticsData: AnalyticsData = {
+    topProductsByRevenue: [
+        { name: "Atorvastatin 20mg", value: 12500000 },
+        { name: "Metformin 500mg", value: 9800000 },
+        { name: "Amlodipine 5mg", value: 7600000 },
+        { name: "Rosuvastatin 10mg", value: 6500000 },
+        { name: "Panadol 500mg", value: 5400000 },
+        { name: "Ciprofloxacin 500mg", value: 4300000 },
+        { name: "Amoxicillin 250mg", value: 3200000 },
+        { name: "Losartan 50mg", value: 2100000 },
+        { name: "Omeprazole 20mg", value: 1800000 },
+        { name: "Ibuprofen 400mg", value: 1500000 },
+    ],
+    topProductsByVolume: [
+        { name: "Panadol 500mg", value: 50000 },
+        { name: "Metformin 500mg", value: 35000 },
+        { name: "Amoxicillin 250mg", value: 32000 },
+        { name: "Ibuprofen 400mg", value: 28000 },
+        { name: "Amlodipine 5mg", value: 25000 },
+        { name: "Ciprofloxacin 500mg", value: 22000 },
+        { name: "Atorvastatin 20mg", value: 18000 },
+        { name: "Omeprazole 20mg", value: 15000 },
+        { name: "Losartan 50mg", value: 12000 },
+        { name: "Rosuvastatin 10mg", value: 10000 },
+    ],
+    topGeographicAreas: [
+        { name: "Faisalabad", value: 35 },
+        { name: "Lahore", value: 28 },
+        { name: "Gojra", value: 15 },
+        { name: "TTS", value: 12 },
+        { name: "Kamalia", value: 10 },
+    ],
+    topCustomerSegments: [
+        { name: "Pharmacy", value: 60 },
+        { name: "Hospital", value: 25 },
+        { name: "Clinic", value: 15 },
+    ],
+    promisingNewCustomers: [
+        { id: "cust-101", name: "New Life Pharmacy, Lahore", purchases: 5, totalValue: 550000 },
+        { id: "cust-102", name: "Hope Hospital, Faisalabad", purchases: 3, totalValue: 1200000 },
+        { id: "cust-103", name: "Care Clinic, Gojra", purchases: 8, totalValue: 320000 },
+    ]
+}

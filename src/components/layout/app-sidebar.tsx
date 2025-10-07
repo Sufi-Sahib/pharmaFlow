@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import {
   Sidebar,
@@ -100,11 +101,13 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Analytics">
-              <AreaChart />
-              <span>Analytics</span>
-            </SidebarMenuButton>
+           <SidebarMenuItem>
+            <Link href="/analytics" passHref>
+              <SidebarMenuButton tooltip="Analytics">
+                <AreaChart />
+                <span>Analytics</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Settings">

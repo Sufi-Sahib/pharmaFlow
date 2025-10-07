@@ -122,3 +122,23 @@ export type AuditLog = {
     details: string;
     status: "Success" | "Failure" | "Pending";
 }
+
+type ChartDataItem = {
+  name: string;
+  value: number;
+}
+
+type CustomerItem = {
+    id: string;
+    name: string;
+    purchases: number;
+    totalValue: number;
+}
+
+export type AnalyticsData = {
+    topProductsByRevenue: ChartDataItem[];
+    topProductsByVolume: ChartDataItem[];
+    topGeographicAreas: ChartDataItem[];
+    topCustomerSegments: ChartDataItem[];
+    promisingNewCustomers: CustomerItem[];
+}
