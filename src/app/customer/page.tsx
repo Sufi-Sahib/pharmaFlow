@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import { cn } from "@/lib/utils";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 const productCategories = ["All", "Cardiovascular", "Diabetes", "Antibiotics"];
 
@@ -29,6 +30,9 @@ function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
                 <div className="relative">
                     <Image src={product.imageUrl} alt={product.name} width={200} height={200} className="w-full h-32 object-cover rounded-md mb-4" data-ai-hint="medicine box" />
                     <Badge variant="secondary" className="absolute top-2 left-2">{product.category}</Badge>
+                     <HelpTooltip className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm p-1 rounded-full">
+                        This card displays product details, including price, stock availability, and your last order information. You can add to cart, request a special price, or view available batches.
+                    </HelpTooltip>
                 </div>
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-muted-foreground">PKR {product.price.toFixed(2)}</p>
@@ -211,6 +215,9 @@ function B2BPortal() {
                                <CardDescription>Your dedicated B2B portal for all procurement needs.</CardDescription>
                             </div>
                              <div className="flex items-center gap-2">
+                                <HelpTooltip>
+                                    This is your main portal. Use the search and filter options to find products. You can also request a product that is not listed.
+                                </HelpTooltip>
                                 <RequestProductDialog />
                                 <div className="relative">
                                     <Button variant="ghost" size="icon">
@@ -238,7 +245,7 @@ function B2BPortal() {
                  
                  {view === 'products' ? (
                      <Card>
-                        <CardHeader>
+                        <CardHeader className="flex-row items-center justify-between">
                             <CardTitle>Products</CardTitle>
                             <div className="flex flex-wrap gap-2 pt-2">
                                 {productCategories.map(category => (
@@ -269,8 +276,11 @@ function B2BPortal() {
             </div>
             <div className="lg:col-span-1 space-y-6">
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex-row items-center justify-between">
                         <CardTitle>Your Cart</CardTitle>
+                        <HelpTooltip>
+                            This card shows the items in your shopping cart. You can request a discount for the entire cart.
+                        </HelpTooltip>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
@@ -288,8 +298,11 @@ function B2BPortal() {
                     </CardFooter>
                 </Card>
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex-row items-center justify-between">
                         <CardTitle>My Bids</CardTitle>
+                        <HelpTooltip>
+                            This card shows your active price requests (bids) and any counter-offers from the distributor.
+                        </HelpTooltip>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-start gap-2">
@@ -318,40 +331,47 @@ function SalesReturnView() {
     return (
         <Card>
             <CardHeader className="flex-row items-center justify-between">
-                <CardTitle>My Sales Returns</CardTitle>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button><Undo2 className="mr-2 h-4 w-4" /> Request New Return</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Request a Sales Return</DialogTitle>
-                            <DialogDescription>Select the invoice and products you wish to return.</DialogDescription>
-                        </DialogHeader>
-                         <div className="grid gap-4 py-4">
-                            <Select>
-                                <SelectTrigger><SelectValue placeholder="Select an Invoice" /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="inv-001">INV-001</SelectItem>
-                                    <SelectItem value="inv-002">INV-002</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p className="text-sm font-medium">Select products to return:</p>
-                             <div className="space-y-2">
-                                <div className="flex items-center justify-between gap-4 border p-2 rounded-lg">
-                                    <div>
-                                        <p className="font-semibold">Amlodipine 5mg</p>
-                                        <p className="text-sm text-muted-foreground">Purchased: 50</p>
+                <div>
+                    <CardTitle>My Sales Returns</CardTitle>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <HelpTooltip>
+                        This section shows the status of your sales return requests. You can also initiate a new return from here.
+                    </HelpTooltip>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button><Undo2 className="mr-2 h-4 w-4" /> Request New Return</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Request a Sales Return</DialogTitle>
+                                <DialogDescription>Select the invoice and products you wish to return.</DialogDescription>
+                            </DialogHeader>
+                             <div className="grid gap-4 py-4">
+                                <Select>
+                                    <SelectTrigger><SelectValue placeholder="Select an Invoice" /></SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="inv-001">INV-001</SelectItem>
+                                        <SelectItem value="inv-002">INV-002</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-sm font-medium">Select products to return:</p>
+                                 <div className="space-y-2">
+                                    <div className="flex items-center justify-between gap-4 border p-2 rounded-lg">
+                                        <div>
+                                            <p className="font-semibold">Amlodipine 5mg</p>
+                                            <p className="text-sm text-muted-foreground">Purchased: 50</p>
+                                        </div>
+                                        <Input type="number" placeholder="Return Qty" className="w-24" />
                                     </div>
-                                    <Input type="number" placeholder="Return Qty" className="w-24" />
                                 </div>
                             </div>
-                        </div>
-                        <DialogFooter>
-                            <Button>Submit Return Request</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            <DialogFooter>
+                                <Button>Submit Return Request</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -392,5 +412,3 @@ export default function CustomerPage() {
         </SidebarProvider>
     );
 }
-
-    

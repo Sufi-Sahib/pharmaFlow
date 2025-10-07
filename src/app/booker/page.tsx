@@ -17,6 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import { useToast } from "@/hooks/use-toast";
 import { useGeo } from "@/context/geo-provider";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function BookerHome() {
   const [view, setView] = useState("home");
@@ -62,9 +63,14 @@ function BookerHome() {
               <Button size="lg" variant="outline" onClick={() => handleViewChange('return')}><Undo2 className="mr-2" />Initiate Return</Button>
             </div>
              <Card>
-                <CardHeader>
-                    <CardTitle>Action-Based Geo-Stamping</CardTitle>
-                    <CardDescription>Capture location for key events.</CardDescription>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Action-Based Geo-Stamping</CardTitle>
+                        <CardDescription>Capture location for key events.</CardDescription>
+                    </div>
+                     <HelpTooltip>
+                        This card allows you to 'Check-In' at the start of your route and 'Check-Out' at the end, capturing your location for verification.
+                      </HelpTooltip>
                 </CardHeader>
                 <CardContent className="space-y-4">
                      <Alert>
@@ -84,8 +90,13 @@ function BookerHome() {
             </Card>
         </div>
          <Card>
-            <CardHeader>
-                <CardTitle>Today's Route</CardTitle>
+            <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Today's Route</CardTitle>
+                </div>
+                 <HelpTooltip>
+                    This card displays your assigned customer route for the day. You can search for specific customers.
+                  </HelpTooltip>
                  <div className="relative mt-2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input placeholder="Search customers..." className="pl-8" />
@@ -146,6 +157,9 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <CardTitle>Place New Order</CardTitle>
+                 <HelpTooltip>
+                    Use this form to select a customer, view their credit status, and add products to create a new order.
+                  </HelpTooltip>
             </div>
 
             {!isOnline && (
@@ -168,9 +182,14 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
                     </Select>
 
                      <Card className="bg-blue-50 border-blue-200">
-                        <CardHeader>
-                            <CardTitle className="text-blue-800 text-lg">Customer Credit</CardTitle>
-                            <CardDescription>Real-time credit status</CardDescription>
+                        <CardHeader className="flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="text-blue-800 text-lg">Customer Credit</CardTitle>
+                                <CardDescription>Real-time credit status</CardDescription>
+                            </div>
+                            <HelpTooltip>
+                                This card shows the customer's current credit balance and their total credit limit.
+                            </HelpTooltip>
                         </CardHeader>
                         <CardContent>
                             <p className="text-2xl font-bold text-blue-900">PKR 540,000 <span className="text-sm font-normal text-muted-foreground">/ PKR 1,500,000</span></p>
@@ -217,7 +236,12 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
 function BookerSalesReturn({ goBack }: { goBack: () => void; }) {
     return (
         <div>
-            <CardTitle className="mb-4">Initiate Sales Return</CardTitle>
+            <div className="flex justify-between items-center mb-4">
+                <CardTitle>Initiate Sales Return</CardTitle>
+                <HelpTooltip>
+                    Use this form to request a sales return for a customer. Select the customer, original invoice, and specify quantities for the products being returned.
+                </HelpTooltip>
+            </div>
             <Card>
                 <CardContent className="pt-6 space-y-4">
                     <Select>

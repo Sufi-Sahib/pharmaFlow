@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { auditLogs } from "@/lib/data";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function AuditHistoryScreen() {
   const statusColors: { [key: string]: string } = {
@@ -22,9 +23,14 @@ function AuditHistoryScreen() {
         </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>System Logs</CardTitle>
-          <CardDescription>All recorded events in chronological order.</CardDescription>
+        <CardHeader className="flex-row items-center justify-between">
+            <div>
+                <CardTitle>System Logs</CardTitle>
+                <CardDescription>All recorded events in chronological order.</CardDescription>
+            </div>
+          <HelpTooltip>
+            This card displays a comprehensive log of all actions taken by users and the system for auditing and tracking purposes.
+          </HelpTooltip>
         </CardHeader>
         <CardContent>
            <Table>

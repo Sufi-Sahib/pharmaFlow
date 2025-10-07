@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useGeoLocation } from '@/hooks/use-geo-location';
 import { useToast } from '@/hooks/use-toast';
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void }) {
     return (
@@ -29,7 +30,12 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
                 </AlertDescription>
             </Alert>
             <Card>
-                <CardHeader><CardTitle>Digital Delivery Challan</CardTitle></CardHeader>
+                <CardHeader className="flex-row items-center justify-between">
+                    <CardTitle>Digital Delivery Challan</CardTitle>
+                    <HelpTooltip>
+                        This card lists all your assigned delivery tasks. Click on a task to view details and collect payment.
+                    </HelpTooltip>
+                </CardHeader>
                 <CardContent className="space-y-4">
                     {activeDeliveries.sort((a,b) => a.status === 'Delivered' ? 1 : -1).map(task => (
                         <Card 
@@ -91,9 +97,14 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
     if (isReturning) {
         return (
              <Card className="max-w-lg mx-auto">
-                <CardHeader>
-                    <CardTitle>On-Spot Sales Return</CardTitle>
-                    <CardDescription>For Order ID: {task.id}</CardDescription>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>On-Spot Sales Return</CardTitle>
+                        <CardDescription>For Order ID: {task.id}</CardDescription>
+                    </div>
+                    <HelpTooltip>
+                        Use this form to process a sales return for the customer on the spot. Specify the quantity of items being returned.
+                    </HelpTooltip>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -118,9 +129,14 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
 
     return (
         <Card className="max-w-lg mx-auto">
-            <CardHeader>
-                <CardTitle>Collect Payment: {task.customer}</CardTitle>
-                <CardDescription>Order ID: {task.id} | Items: {task.itemsCount}</CardDescription>
+            <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Collect Payment: {task.customer}</CardTitle>
+                    <CardDescription>Order ID: {task.id} | Items: {task.itemsCount}</CardDescription>
+                </div>
+                <HelpTooltip>
+                    This screen is for collecting payment for the selected delivery. You can mark it as cash received, upload a cheque image, or initiate an on-spot return.
+                </HelpTooltip>
             </CardHeader>
             <CardContent className="space-y-6">
                 {error && <Alert variant="destructive"><AlertTriangle className="h-4 w-4" /><AlertTitle>Location Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}

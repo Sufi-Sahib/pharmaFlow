@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; onUpdate: (id: string, updates: Partial<Distributor>) => void; }) {
   const statusColors: { [key: string]: string } = {
@@ -42,7 +43,12 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
                 <CardTitle>{distributor.companyName}</CardTitle>
                 <CardDescription>Package: {distributor.package}</CardDescription>
             </div>
-            <Badge className={statusColors[distributor.status]}>{distributor.status}</Badge>
+            <div className="flex items-center gap-2">
+              <HelpTooltip>
+                This card shows a summary of the distributor's account, including their status, resource usage, and monthly performance.
+              </HelpTooltip>
+              <Badge className={statusColors[distributor.status]}>{distributor.status}</Badge>
+            </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -22,6 +22,7 @@ import { getCounterPriceSuggestion } from "@/app/actions";
 import type { SuggestCounterPriceOutput } from "@/ai/flows/suggest-counter-price";
 import { Wand, Loader2, Lightbulb, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { HelpTooltip } from "../ui/help-tooltip";
 
 function BidDetailView({ bid, onBack }: { bid: Bid; onBack: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -196,9 +197,14 @@ export function BiddingOverview() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="font-headline">Bidding Overview</CardTitle>
-        <CardDescription>Monitor and act on price bids.</CardDescription>
+      <CardHeader className="flex-row items-center justify-between">
+        <div>
+            <CardTitle className="font-headline">Bidding Overview</CardTitle>
+            <CardDescription>Monitor and act on price bids.</CardDescription>
+        </div>
+         <HelpTooltip>
+            This card lists all pending price bids from customers. Click a bid to view details, suggest a counter-offer with AI, accept, or reject it.
+          </HelpTooltip>
       </CardHeader>
       <CardContent>
         {selectedBid ? (

@@ -14,15 +14,19 @@ import { ArrowDown, ArrowUp, BarChart3, Bell, DollarSign, Package, Search, Shopp
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-function StatCard({ title, value, change, changeType, icon: Icon }: { title: string, value: string, change: string, changeType: 'increase' | 'decrease', icon: React.ElementType }) {
+function StatCard({ title, value, change, changeType, icon: Icon, tooltipText }: { title: string, value: string, change: string, changeType: 'increase' | 'decrease', icon: React.ElementType, tooltipText: string }) {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <div className="flex items-center gap-2">
+                   <HelpTooltip>{tooltipText}</HelpTooltip>
+                   <Icon className="h-4 w-4 text-muted-foreground" />
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{value}</div>
@@ -47,8 +51,11 @@ function ProductPerformanceList({ products, title }: { products: { name: string,
 
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex-row items-center justify-between">
                 <CardTitle>{title}</CardTitle>
+                 <HelpTooltip>
+                    This card lists products ranked by their performance, either by total revenue generated or total volume sold.
+                  </HelpTooltip>
                 <div className="relative mt-2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -103,12 +110,15 @@ function SuperAdminAnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title="Total Distributors" value={data.totalDistributors.current.toString()} change={`${data.totalDistributors.change}%`} changeType={data.totalDistributors.changeType} icon={Users} />
-                <StatCard title="Total Platform Revenue" value={`PKR ${data.totalRevenue.current.toLocaleString()}`} change={`${data.totalRevenue.change}%`} changeType={data.totalRevenue.changeType} icon={DollarSign} />
-                <StatCard title="Total Orders" value={data.totalOrders.current.toLocaleString()} change={`${data.totalOrders.change}%`} changeType={data.totalOrders.changeType} icon={ShoppingCart} />
+                <StatCard title="Total Distributors" value={data.totalDistributors.current.toString()} change={`${data.totalDistributors.change}%`} changeType={data.totalDistributors.changeType} icon={Users} tooltipText="Total number of approved distributors on the platform." />
+                <StatCard title="Total Platform Revenue" value={`PKR ${data.totalRevenue.current.toLocaleString()}`} change={`${data.totalRevenue.change}%`} changeType={data.totalRevenue.changeType} icon={DollarSign} tooltipText="Total revenue generated across all distributors on the platform." />
+                <StatCard title="Total Orders" value={data.totalOrders.current.toLocaleString()} change={`${data.totalOrders.change}%`} changeType={data.totalOrders.changeType} icon={ShoppingCart} tooltipText="Total number of orders placed across the entire platform." />
                 <Card>
-                    <CardHeader className="pb-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Platform Sales vs Target</CardTitle>
+                        <HelpTooltip>
+                            This card shows the platform's overall sales performance against its monthly or yearly target.
+                          </HelpTooltip>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">78%</div>
@@ -121,8 +131,11 @@ function SuperAdminAnalyticsDashboard() {
                 <ProductPerformanceList products={data.topProductsByRevenue} title="Top Products by Revenue" />
 
                 <Card>
-                    <CardHeader>
+                    <CardHeader className="flex-row items-center justify-between">
                         <CardTitle>Platform Alerts</CardTitle>
+                         <HelpTooltip>
+                            This card displays important system-wide notifications and alerts.
+                          </HelpTooltip>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -142,8 +155,11 @@ function SuperAdminAnalyticsDashboard() {
                     </CardContent>
                 </Card>
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="flex-row items-center justify-between">
                     <CardTitle>Sales by Distributor</CardTitle>
+                    <HelpTooltip>
+                      This chart visualizes the sales performance of each individual distributor.
+                    </HelpTooltip>
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
@@ -182,10 +198,10 @@ function AdminAnalyticsDashboard() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard title="Total Revenue" value={`PKR ${data.totalRevenue.current.toLocaleString()}`} change={`${data.totalRevenue.change}%`} changeType={data.totalRevenue.changeType} icon={DollarSign} />
-                <StatCard title="Total Orders" value={data.totalOrders.current.toLocaleString()} change={`${data.totalOrders.change}%`} changeType={data.totalOrders.changeType} icon={ShoppingCart} />
-                <StatCard title="New Customers" value={data.newCustomers.current.toString()} change={`${data.newCustomers.change}%`} changeType={data.newCustomers.changeType} icon={Users} />
-                <StatCard title="Avg. Order Value" value={`PKR ${data.avgOrderValue.current.toLocaleString()}`} change={`${data.avgOrderValue.change}%`} changeType={data.avgOrderValue.changeType} icon={Package} />
+                <StatCard title="Total Revenue" value={`PKR ${data.totalRevenue.current.toLocaleString()}`} change={`${data.totalRevenue.change}%`} changeType={data.totalRevenue.changeType} icon={DollarSign} tooltipText="Total revenue generated by your distributorship." />
+                <StatCard title="Total Orders" value={data.totalOrders.current.toLocaleString()} change={`${data.totalOrders.change}%`} changeType={data.totalOrders.changeType} icon={ShoppingCart} tooltipText="Total number of orders processed by your distributorship." />
+                <StatCard title="New Customers" value={data.newCustomers.current.toString()} change={`${data.newCustomers.change}%`} changeType={data.newCustomers.changeType} icon={Users} tooltipText="Number of new customers who placed their first order." />
+                <StatCard title="Avg. Order Value" value={`PKR ${data.avgOrderValue.current.toLocaleString()}`} change={`${data.avgOrderValue.change}%`} changeType={data.avgOrderValue.changeType} icon={Package} tooltipText="The average value of each order placed with your distributorship." />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -194,9 +210,14 @@ function AdminAnalyticsDashboard() {
             </div>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>Promising New Customers</CardTitle>
-                    <CardDescription>New customers with frequent cash purchases.</CardDescription>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Promising New Customers</CardTitle>
+                        <CardDescription>New customers with frequent cash purchases.</CardDescription>
+                    </div>
+                    <HelpTooltip>
+                        This table highlights new customers who have made multiple cash purchases, indicating potential for credit extension.
+                    </HelpTooltip>
                 </CardHeader>
                 <CardContent>
                     <Table>

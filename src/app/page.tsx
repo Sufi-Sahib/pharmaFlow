@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 const roles = [
     { name: "Super Admin", href: "/admin", description: "Manage distributors and platform settings." },
@@ -35,9 +36,14 @@ export default function Home() {
                 <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {roles.map((role) => (
                         <Card key={role.name}>
-                            <CardHeader>
-                                <CardTitle>{role.name}</CardTitle>
-                                <CardDescription>{role.description}</CardDescription>
+                            <CardHeader className="flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle>{role.name}</CardTitle>
+                                    <CardDescription>{role.description}</CardDescription>
+                                </div>
+                                <HelpTooltip>
+                                    Click the button to navigate to the {role.name} dashboard. This role is responsible for: {role.description}
+                                </HelpTooltip>
                             </CardHeader>
                             <CardContent>
                                 <Link href={role.href}>

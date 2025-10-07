@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 const summaryData = {
     totalOrders: { title: "Total Orders", value: "1,289" },
@@ -80,9 +81,14 @@ function EditOrderView({ order, onBack, onSave }: { order: Order, onBack: () => 
         <div>
             <Button variant="ghost" onClick={onBack} className="mb-4"><ArrowLeft className="mr-2" /> Back to Orders</Button>
             <Card>
-                <CardHeader>
-                    <CardTitle>Editing Order: {editedOrder.id}</CardTitle>
-                    <CardDescription>Customer: {editedOrder.customer} | Booker: {editedOrder.booker}</CardDescription>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Editing Order: {editedOrder.id}</CardTitle>
+                        <CardDescription>Customer: {editedOrder.customer} | Booker: {editedOrder.booker}</CardDescription>
+                    </div>
+                     <HelpTooltip>
+                        This view allows you to modify an order before fulfillment. You can adjust quantities, remove items, or add new products from the available list.
+                      </HelpTooltip>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
@@ -186,11 +192,16 @@ function OrderFulfillmentCard({
 
   return (
     <Card className="col-span-1 lg:col-span-3">
-      <CardHeader>
-        <CardTitle>New Order Fulfillment</CardTitle>
-        <CardDescription>
-          Review, edit, and assign new orders for delivery.
-        </CardDescription>
+      <CardHeader className="flex-row items-center justify-between">
+        <div>
+            <CardTitle>New Order Fulfillment</CardTitle>
+            <CardDescription>
+              Review, edit, and assign new orders for delivery.
+            </CardDescription>
+        </div>
+        <HelpTooltip>
+            This card shows new incoming orders. Use the tabs to switch between orders sourced by bookers and those placed directly by customers. You can edit an order before fulfillment or assign it to a delivery staff member.
+        </HelpTooltip>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="booker">
@@ -462,13 +473,18 @@ function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () 
         <div>
              <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to {backButtonText()}</Button>
              <Card>
-                 <CardHeader>
-                     <CardTitle>Order {order.id}</CardTitle>
-                     <CardDescription>
-                         Customer: {order.customer} <br />
-                         Booker: {order.booker} <br />
-                         Date: {order.date}
-                     </CardDescription>
+                 <CardHeader className="flex-row items-center justify-between">
+                     <div>
+                         <CardTitle>Order {order.id}</CardTitle>
+                         <CardDescription>
+                             Customer: {order.customer} <br />
+                             Booker: {order.booker} <br />
+                             Date: {order.date}
+                         </CardDescription>
+                     </div>
+                      <HelpTooltip>
+                        This is a detailed invoice view of a specific order, showing all items, quantities, prices, and the final total.
+                      </HelpTooltip>
                  </CardHeader>
                  <CardContent>
                      <Table>
@@ -662,6 +678,9 @@ function ProductManagement() {
                     <CardDescription>Add, upload, and manage your product listings.</CardDescription>
                 </div>
                 <div className="flex gap-2">
+                     <HelpTooltip>
+                        Use this card to manage your product catalog. You can add products individually, upload a CSV for bulk updates, or export your current product list.
+                      </HelpTooltip>
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button><PlusCircle className="mr-2" /> Add New Product</Button>
@@ -767,9 +786,14 @@ function ProductInsights() {
     const { toast } = useToast();
     return (
         <Card className="col-span-1 lg:col-span-3">
-            <CardHeader>
-                <CardTitle>Product & Stock Insights</CardTitle>
-                <CardDescription>Review customer requests and monitor top-selling products.</CardDescription>
+            <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Product & Stock Insights</CardTitle>
+                    <CardDescription>Review customer requests and monitor top-selling products.</CardDescription>
+                </div>
+                 <HelpTooltip>
+                    This card provides insights into product demand. The 'Requested Products' list shows items customers want, and 'Top Selling This Month' helps you prioritize stock for popular items.
+                  </HelpTooltip>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -1002,7 +1026,12 @@ function AdminDashboard() {
                             <CardTitle className="text-sm font-medium">{summaryData.totalOrders.title}</CardTitle>
                              <p className="text-2xl font-bold">{summaryData.totalOrders.value}</p>
                         </div>
-                        <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalOrders.title && "rotate-180")} />
+                        <div className="flex items-center gap-2">
+                            <HelpTooltip>
+                                This card shows the total number of orders. Click to expand and view orders categorized by area, customer, or booker.
+                            </HelpTooltip>
+                            <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalOrders.title && "rotate-180")} />
+                        </div>
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -1021,7 +1050,12 @@ function AdminDashboard() {
                             <CardTitle className="text-sm font-medium">{summaryData.totalSales.title}</CardTitle>
                              <p className="text-2xl font-bold">{summaryData.totalSales.value}</p>
                         </div>
-                        <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalSales.title && "rotate-180")} />
+                        <div className="flex items-center gap-2">
+                            <HelpTooltip>
+                                This card shows the total sales revenue. Click to expand and view a detailed list of all sales invoices.
+                            </HelpTooltip>
+                            <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalSales.title && "rotate-180")} />
+                        </div>
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -1040,7 +1074,12 @@ function AdminDashboard() {
                             <CardTitle className="text-sm font-medium">{summaryData.paymentsReceived.title}</CardTitle>
                             <p className="text-2xl font-bold">{summaryData.paymentsReceived.value}</p>
                         </div>
+                        <div className="flex items-center gap-2">
+                         <HelpTooltip>
+                            This card shows the total payments received. Click to expand and view a list of all paid invoices.
+                          </HelpTooltip>
                          <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.paymentsReceived.title && "rotate-180")} />
+                        </div>
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -1059,7 +1098,12 @@ function AdminDashboard() {
                             <CardTitle className="text-sm font-medium">{summaryData.receivables.title}</CardTitle>
                             <p className="text-2xl font-bold">{summaryData.receivables.value}</p>
                         </div>
-                         <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.receivables.title && "rotate-180")} />
+                        <div className="flex items-center gap-2">
+                            <HelpTooltip>
+                                This card shows the total outstanding receivables. Click to expand and view a list of all unpaid or overdue invoices.
+                            </HelpTooltip>
+                            <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.receivables.title && "rotate-180")} />
+                        </div>
                     </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -1094,9 +1138,14 @@ function AdminDashboard() {
 
         <div className="lg:col-span-2 space-y-6">
             <Card>
-                <CardHeader>
-                    <CardTitle>Sales Return Requests</CardTitle>
-                    <CardDescription>Approve or reject customer return requests.</CardDescription>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Sales Return Requests</CardTitle>
+                        <CardDescription>Approve or reject customer return requests.</CardDescription>
+                    </div>
+                    <HelpTooltip>
+                        This card lists all pending sales return requests. Click a request to view its details and approve or reject it.
+                    </HelpTooltip>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -1116,8 +1165,13 @@ function AdminDashboard() {
       </div>
 
       <Card className="col-span-1 lg:col-span-3">
-        <CardHeader>
-          <CardTitle>Sales Team Performance</CardTitle>
+        <CardHeader className="flex-row items-center justify-between">
+          <div>
+            <CardTitle>Sales Team Performance</CardTitle>
+          </div>
+          <HelpTooltip>
+            This card shows the sales performance of your team members against their targets. Click on a team member to see a detailed view of their individual performance.
+          </HelpTooltip>
         </CardHeader>
         <CardContent>
           {renderSalesTeamContent()}

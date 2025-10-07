@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import { accountSummary, transactions } from "@/lib/data";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function AgingBucket({ title, amount }: { title: string, amount: number }) {
   if (amount === 0) return null;
@@ -41,8 +42,11 @@ function LedgerScreen() {
         )}
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex-row items-center justify-between">
           <CardTitle>Credit & Aging Summary</CardTitle>
+          <HelpTooltip>
+            This card shows your credit limit, current balance, and a breakdown of your outstanding payments by aging period.
+          </HelpTooltip>
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
@@ -72,8 +76,11 @@ function LedgerScreen() {
       </Card>
       
        <Card>
-        <CardHeader>
+        <CardHeader className="flex-row items-center justify-between">
           <CardTitle>Detailed Statement</CardTitle>
+          <HelpTooltip>
+            This table provides a complete history of all your financial transactions, including invoices, payments, and credit notes.
+          </HelpTooltip>
         </CardHeader>
         <CardContent>
            <Table>
