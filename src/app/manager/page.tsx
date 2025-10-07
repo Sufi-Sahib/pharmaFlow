@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useMemo, useRef } from "react";
@@ -10,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search, Upload, Download, Camera } from "lucide-react";
-import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches } from "@/lib/data";
+import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search, Upload, Download, Camera, ShoppingBasket } from "lucide-react";
+import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches, productRequests, topSellingProducts } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -763,6 +764,51 @@ function ProductManagement() {
     );
 }
 
+function ProductInsights() {
+    const { toast } = useToast();
+    return (
+        <Card className="col-span-1 lg:col-span-3">
+            <CardHeader>
+                <CardTitle>Product & Stock Insights</CardTitle>
+                <CardDescription>Review customer requests and monitor top-selling products.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 className="font-semibold mb-2 text-lg">Requested Products</h3>
+                    <div className="space-y-3">
+                        {productRequests.map(req => (
+                            <div key={req.id} className="flex items-center gap-3 p-2 border rounded-lg">
+                                <ShoppingBasket className="h-5 w-5 text-muted-foreground" />
+                                <div className="flex-grow">
+                                    <p className="font-semibold">{req.productName}</p>
+                                    <p className="text-xs text-muted-foreground">Requested by: {req.customer} | Qty: {req.quantity}</p>
+                                </div>
+                                <Button size="sm" variant="outline" onClick={() => toast({ title: `Sourcing for ${req.productName} initiated.` })}>
+                                    Source
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                 <div>
+                    <h3 className="font-semibold mb-2 text-lg">Top Selling This Month</h3>
+                    <div className="space-y-3">
+                        {topSellingProducts.map(prod => (
+                            <div key={prod.name} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                                <Image src={prod.imageUrl} alt={prod.name} width={40} height={40} className="rounded-md object-cover" />
+                                <div className="flex-grow">
+                                    <p className="font-semibold">{prod.name}</p>
+                                    <p className="text-xs text-muted-foreground">Sold: {prod.unitsSold} units</p>
+                                </div>
+                                <p className="font-bold text-green-600">PKR {prod.revenue.toLocaleString()}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
 
 function AdminDashboard() {
     const { toast } = useToast();
@@ -1060,6 +1106,10 @@ function AdminDashboard() {
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <ProductManagement />
       </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ProductInsights />
+      </div>
 
       <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
@@ -1112,5 +1162,3 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
-
-    

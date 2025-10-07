@@ -1,4 +1,5 @@
 
+
 import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData, SalesTeamMember, Order } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
@@ -241,6 +242,19 @@ export const productsWithBatches: Product[] = [
         ]
     },
 ];
+
+export const productRequests = [
+    { id: 'req-1', productName: 'Lisinopril 10mg', customer: 'National Hospital', quantity: 500 },
+    { id: 'req-2', productName: 'Omeprazole 20mg', customer: 'Ali Clinic', quantity: 1000 },
+    { id: 'req-3', productName: 'Simvastatin 40mg', customer: 'Chenab Pharmacy', quantity: 300 },
+];
+
+export const topSellingProducts = [
+    { name: "Amlodipine 5mg", imageUrl: "https://picsum.photos/seed/product1/200/200", unitsSold: 450, revenue: 900000 },
+    { name: "Metformin 500mg", imageUrl: "https://picsum.photos/seed/product2/200/200", unitsSold: 600, revenue: 945000 },
+    { name: "Panadol 500mg", imageUrl: "https://picsum.photos/seed/product4/200/200", unitsSold: 1200, revenue: 600000 },
+];
+
 
 export const salesReturns: SalesReturn[] = [
   { id: "RTN-051", customer: "Ali Clinic", date: "2023-10-23", invoiceId: "INV-9872", amount: 15000, status: "Pending" },
