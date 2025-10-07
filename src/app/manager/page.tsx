@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search, Upload, Download, Camera, ShoppingBasket } from "lucide-react";
-import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches, productRequests, topSellingProducts } from "@/lib/data";
+import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches, productRequests, topSellingProducts, customers } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -155,6 +155,7 @@ function OrderFulfillmentCard({
   onEdit: (order: Order) => void;
   onAssign: (order: Order) => void;
 }) {
+  const { toast } = useToast();
   const bookerSourcedOrders = orders.filter((o) => o.booker !== 'Direct');
   const customerSourcedOrders = orders.filter((o) => o.booker === 'Direct');
 
@@ -199,9 +200,66 @@ function OrderFulfillmentCard({
               Review, edit, and assign new orders for delivery.
             </CardDescription>
         </div>
-        <HelpTooltip>
-            This card shows new incoming orders. Use the tabs to switch between orders sourced by bookers and those placed directly by customers. You can edit an order before fulfillment or assign it to a delivery staff member.
-        </HelpTooltip>
+        <div className="flex items-center gap-2">
+            <HelpTooltip>
+                This card shows new incoming orders. Use the tabs to switch between orders sourced by bookers and those placed directly by customers. You can edit an order before fulfillment or assign it to a delivery staff member.
+            </HelpTooltip>
+             <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline"><Download className="mr-2" /> Export All</Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Export Order Summary</DialogTitle>
+                        <DialogDescription>Select filters to create a specific order summary.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <Label>Filter by Area</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select an area" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.keys(areaOrders).map(area => (
+                                        <SelectItem key={area} value={area}>{area}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                         <div className="space-y-2">
+                            <Label>Filter by Delivery Staff</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a staff member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {deliveryStaff.map(staff => (
+                                        <SelectItem key={staff.id} value={staff.name}>{staff.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Filter by Customer</Label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a customer" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                     {customers.map(customer => (
+                                        <SelectItem key={customer.name} value={customer.name}>{customer.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => toast({ title: "Export Started", description: "Your order summary is being generated." })}>Export Summary</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="booker">
@@ -786,7 +844,7 @@ function ProductInsights() {
     const { toast } = useToast();
     return (
         <Card className="col-span-1 lg:col-span-3">
-            <CardHeader className="flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                     <CardTitle>Product & Stock Insights</CardTitle>
                     <CardDescription>Review customer requests and monitor top-selling products.</CardDescription>
@@ -964,7 +1022,7 @@ function AdminDashboard() {
     const renderReceivablesContent = () => {
         if (receivablesDetailState.view === 'invoice_detail') {
             return <OrderInvoiceView 
-                        order={selectedOrderData} 
+                        order={selectedOrderData} _build
                         onBack={() => setReceivablesDetailState({ view: 'list', orderId: '' })} 
                         backView="invoices"
                     />
@@ -1220,3 +1278,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    
