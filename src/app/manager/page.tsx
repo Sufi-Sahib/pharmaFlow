@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { BiddingOverview } from "@/components/dashboard/bidding-overview";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search } from "lucide-react";
+import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search, Upload, Download, Camera } from "lucide-react";
 import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -21,7 +21,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-
+import Image from "next/image";
+import { Textarea } from "@/components/ui/textarea";
 
 const summaryData = {
     totalOrders: { title: "Total Orders", value: "1,289" },
@@ -631,6 +632,138 @@ function SalesTeamMemberDetailView({ member, onBack }: { member: any, onBack: ()
     )
 }
 
+function ProductManagement() {
+    const { toast } = useToast();
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const triggerCamera = () => {
+        if(fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    return (
+        <Card className="col-span-1 lg:col-span-3">
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Product Management</CardTitle>
+                    <CardDescription>Add, upload, and manage your product listings.</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button><PlusCircle className="mr-2" /> Add New Product</Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                             <DialogHeader>
+                                <DialogTitle>Add a New Product</DialogTitle>
+                                <DialogDescription>Fill in the details of the new product.</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-name">Product Name</Label>
+                                    <Input id="product-name" placeholder="e.g., Paracetamol 500mg" />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label htmlFor="product-category">Category</Label>
+                                    <Input id="product-category" placeholder="e.g., Painkiller" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-price">Trade Price (PKR)</Label>
+                                    <Input id="product-price" type="number" placeholder="450.00" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="product-stock">Stock Quantity</Label>
+                                    <Input id="product-stock" type="number" placeholder="1000" />
+                                </div>
+                                 <div className="md:col-span-2 space-y-2">
+                                    <Label>Product Image</Label>
+                                    <div className="grid grid-cols-2 gap-4 items-center">
+                                        <div className="relative border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors cursor-pointer aspect-square flex flex-col justify-center items-center">
+                                            {imagePreview ? (
+                                                <Image src={imagePreview} alt="Product preview" layout="fill" objectFit="cover" className="rounded-lg" />
+                                            ) : (
+                                                <>
+                                                    <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                                                    <p className="text-sm font-semibold">Upload Image</p>
+                                                    <p className="text-xs text-muted-foreground">Click to browse</p>
+                                                </>
+                                            )}
+                                             <input 
+                                                id="productImage" 
+                                                name="productImage" 
+                                                type="file" 
+                                                accept="image/*"
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                onChange={handleFileChange}
+                                            />
+                                        </div>
+                                         <div className="space-y-2">
+                                            <p className="text-center text-muted-foreground text-sm">Or use your camera</p>
+                                            <Button type="button" variant="outline" className="w-full" onClick={triggerCamera}>
+                                                <Camera className="mr-2" /> Snap Photo
+                                            </Button>
+                                             {/* This input is hidden but is triggered by the button above for camera access on mobile */}
+                                            <input 
+                                                ref={fileInputRef}
+                                                type="file" 
+                                                accept="image/*" 
+                                                capture="environment" 
+                                                className="hidden"
+                                                onChange={handleFileChange}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button onClick={() => toast({ title: "Product Added" })}>Save Product</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                    <div className="flex gap-2">
+                        <Button variant="outline"><Upload className="mr-2" /> Upload CSV</Button>
+                        <Button variant="outline"><Download className="mr-2" /> Export</Button>
+                        <Button variant="link" className="p-0 h-auto">Download Format</Button>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {productsWithBatches.map(product => (
+                        <div key={product.name} className="flex items-center gap-4 p-2 rounded-lg border">
+                             <Image src={product.imageUrl} alt={product.name} width={50} height={50} className="rounded-md object-cover" />
+                             <div className="flex-grow">
+                                <p className="font-semibold">{product.name}</p>
+                                <p className="text-sm text-muted-foreground">{product.category}</p>
+                             </div>
+                             <div className="text-right">
+                                <p className="font-semibold">PKR {product.price.toFixed(2)}</p>
+                                <Badge variant={product.inStock ? "secondary" : "destructive"}>
+                                    {product.inStock ? `Stock: ${product.stock}` : 'Out of Stock'}
+                                </Badge>
+                             </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+
 function AdminDashboard() {
     const { toast } = useToast();
     const [openCard, setOpenCard] = useState<string | null>(null);
@@ -923,8 +1056,12 @@ function AdminDashboard() {
             </Card>
         </div>
       </div>
+      
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ProductManagement />
+      </div>
 
-      <Card>
+      <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
           <CardTitle>Sales Team Performance</CardTitle>
         </CardHeader>
@@ -975,3 +1112,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    
