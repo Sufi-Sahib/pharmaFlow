@@ -1,5 +1,5 @@
 
-import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export const statsCards: StatCard[] = [
@@ -218,4 +218,13 @@ export const transactions: Transaction[] = [
      { id: "TRN-1233", date: "2023-09-18", description: "Payment for ORD-9865", type: 'Payment', credit: 720000, runningBalance: 4520500 },
      { id: "INV-9880", date: "2023-11-01", description: "Invoice ORD-9880", type: 'Invoice', debit: 10000000, runningBalance: 14520500 },
      { id: "INV-9881", date: "2023-11-02", description: "Invoice ORD-9881", type: 'Invoice', debit: 15000000, runningBalance: 29520500 },
+];
+
+
+export const auditLogs: AuditLog[] = [
+    { id: '1', timestamp: '2023-10-26 10:00:00', user: 'Ali Khan', role: 'Booker', action: 'Order Placed', details: 'Order #12345 placed for Customer XYZ', status: 'Success' },
+    { id: '2', timestamp: '2023-10-26 10:05:00', user: 'Fatima Ahmed', role: 'Manager', action: 'Bid Approved', details: 'Bid for Product ABC approved for Customer QRS', status: 'Success' },
+    { id: '3', timestamp: '2023-10-26 10:10:00', user: 'Zainab Mir', role: 'Delivery', action: 'Delivery Update', details: 'Delivery #6789 marked as "On the way"', status: 'Pending' },
+    { id: '4', timestamp: '2023-10-26 10:15:00', user: 'Kamran', role: 'Super Admin', action: 'Distributor Added', details: 'New distributor "Pharma Solutions" added', status: 'Success' },
+    { id: '5', timestamp: '2023-10-26 10:20:00', user: 'Ali Clinic', role: 'Customer', action: 'Sales Return Request', details: 'Sales return requested for Invoice #INV-9872', status: 'Pending' },
 ];

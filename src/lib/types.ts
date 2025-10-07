@@ -107,3 +107,13 @@ export type Transaction = {
   credit?: number;
   runningBalance: number;
 }
+
+export type AuditLog = {
+    id: string;
+    timestamp: string;
+    user: string;
+    role: "Super Admin" | "Manager" | "Customer" | "Booker" | "Delivery";
+    action: string;
+    details: string;
+    status: "Success" | "Failure" | "Pending";
+}

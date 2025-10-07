@@ -19,6 +19,7 @@ import {
   Truck,
   BookUser,
   Wallet,
+  FileClock,
 } from 'lucide-react';
 import { PharmaFlowLogo } from '@/components/icons';
 
@@ -88,6 +89,14 @@ export function AppSidebar() {
               <SidebarMenuButton tooltip="Accounts">
                 <Wallet />
                 <span>Accounts</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/audits" passHref>
+              <SidebarMenuButton tooltip="Audit History">
+                <FileClock />
+                <span>Audit History</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>

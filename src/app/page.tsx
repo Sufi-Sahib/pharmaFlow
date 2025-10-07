@@ -13,6 +13,7 @@ const roles = [
     { name: "Booker", href: "/booker", description: "Place new orders for customers." },
     { name: "Delivery", href: "/delivery", description: "View and manage delivery tasks." },
     { name: "Accounts", href: "/accounts", description: "View financial ledger and credit information." },
+    { name: "Audit History", href: "/audits", description: "View system audit logs." },
 ]
 
 export default function Home() {
