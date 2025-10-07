@@ -29,6 +29,14 @@ export type Bid = {
   status: "Requested" | "Countered" | "Accepted" | "Expired";
 };
 
+export type Order = {
+  id: string;
+  customer: string;
+  booker: string;
+  amount: number;
+  status: "Delivered" | "Shipped" | "Processing" | "Pending";
+};
+
 export type Delivery = {
   id: string;
   orderId: string;

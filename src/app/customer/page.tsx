@@ -7,20 +7,22 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { sampleBid, productsWithBatches as products, salesReturns } from "@/lib/data";
+import { sampleBid, productsWithBatches as allProducts, salesReturns } from "@/lib/data";
 import Image from "next/image";
 import { ShoppingCart, Tag, Search, Bell, Undo2, History, FileText, PlusCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { useGeoLocation } from "@/hooks/use-geo-location";
+import { cn } from "@/lib/utils";
 
+const productCategories = ["All", "Cardiovascular", "Diabetes", "Antibiotics"];
 
-function ProductCard({ product }: { product: (typeof products)[0] }) {
+function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
     return (
         <Card className="flex flex-col">
             <CardContent className="p-4 flex-grow">
@@ -184,6 +186,19 @@ function RequestProductDialog() {
 
 function B2BPortal() {
     const [view, setView] = useState('products');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeCategory, setActiveCategory] = useState('All');
+    const [showInStock, setShowInStock] = useState(false);
+
+    const filteredProducts = useMemo(() => {
+        return allProducts.filter(p => {
+            const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+            const matchesStock = !showInStock || p.inStock;
+            const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+            return matchesCategory && matchesStock && matchesSearch;
+        });
+    }, [searchTerm, activeCategory, showInStock]);
+
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -208,7 +223,12 @@ function B2BPortal() {
                          <div className="flex gap-2 pt-4">
                             <div className="relative flex-1">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input placeholder="Search products..." className="pl-8" />
+                                <Input 
+                                    placeholder="Search products..." 
+                                    className="pl-8" 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
                             </div>
                             <Button variant={view === 'products' ? 'secondary' : 'outline'} onClick={() => setView('products')}>Products</Button>
                             <Button variant={view === 'returns' ? 'secondary' : 'outline'} onClick={() => setView('returns')}>My Returns</Button>
@@ -220,14 +240,26 @@ function B2BPortal() {
                      <Card>
                         <CardHeader>
                             <CardTitle>Products</CardTitle>
-                            <div className="flex gap-2 pt-2">
-                                <Button variant="secondary">Cardiovascular</Button>
-                                <Button variant="outline">Diabetes</Button>
-                                <Button variant="outline">Antibiotics</Button>
+                            <div className="flex flex-wrap gap-2 pt-2">
+                                {productCategories.map(category => (
+                                    <Button 
+                                        key={category} 
+                                        variant={activeCategory === category ? "secondary" : "outline"}
+                                        onClick={() => setActiveCategory(category)}
+                                    >
+                                        {category}
+                                    </Button>
+                                ))}
+                                 <Button 
+                                    variant={showInStock ? "secondary" : "outline"}
+                                    onClick={() => setShowInStock(s => !s)}
+                                >
+                                    In Stock Only
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            {products.map(p => <ProductCard key={p.name} product={p} />)}
+                            {filteredProducts.map(p => <ProductCard key={p.name} product={p} />)}
                         </CardContent>
                     </Card>
                  ) : (
@@ -360,3 +392,5 @@ export default function CustomerPage() {
         </SidebarProvider>
     );
 }
+
+    

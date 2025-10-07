@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { BiddingOverview } from "@/components/dashboard/bidding-overview";
@@ -11,11 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
-import { salesReturns, salesTeam, invoices as mockInvoices } from "@/lib/data";
+import { salesReturns, salesTeam, invoices as mockInvoices, type Order } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+
 
 const summaryData = {
     totalOrders: { title: "Total Orders", value: "1,289" },
@@ -138,10 +141,32 @@ function OrdersDetailView({ onAreaClick, onOrderClick }: { onAreaClick: (area: s
     )
 }
 
-function AreaOrdersView({ area, orders, onBack, onOrderClick }: { area: string, orders: any[], onBack: () => void, onOrderClick: (orderId: string) => void }) {
+function AreaOrdersView({ area, orders, onBack, onOrderClick }: { area: string, orders: Order[], onBack: () => void, onOrderClick: (orderId: string) => void }) {
+    const [statusFilter, setStatusFilter] = useState('All');
+
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => statusFilter === 'All' || order.status === statusFilter);
+    }, [orders, statusFilter]);
+    
     return (
         <div>
-            <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Summary</Button>
+            <div className="flex justify-between items-center mb-4">
+                <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Summary</Button>
+                <div className="flex items-center gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All">All Statuses</SelectItem>
+                            <SelectItem value="Delivered">Delivered</SelectItem>
+                            <SelectItem value="Shipped">Shipped</SelectItem>
+                            <SelectItem value="Processing">Processing</SelectItem>
+                            <SelectItem value="Pending">Pending</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
             <CardTitle className="mb-4">Orders for {area}</CardTitle>
             <Table>
                 <TableHeader>
@@ -153,7 +178,7 @@ function AreaOrdersView({ area, orders, onBack, onOrderClick }: { area: string, 
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {orders.map(order => (
+                    {filteredOrders.map(order => (
                         <TableRow key={order.id} onClick={() => onOrderClick(order.id)} className="cursor-pointer">
                             <TableCell>{order.id}</TableCell>
                             <TableCell>{order.customer}</TableCell>
@@ -446,3 +471,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    
