@@ -629,7 +629,7 @@ function AdminDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <BiddingOverview />
+        <BiddingOverview />
 
         <div className="lg:col-span-2 space-y-6">
             <Card>
@@ -644,15 +644,16 @@ function AdminDashboard() {
                 </CardContent>
             </Card>
         </div>
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Sales Team Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {renderSalesTeamContent()}
-          </CardContent>
-        </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sales Team Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {renderSalesTeamContent()}
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -671,4 +672,3 @@ export default function ManagerPage() {
   );
 }
 
-    
