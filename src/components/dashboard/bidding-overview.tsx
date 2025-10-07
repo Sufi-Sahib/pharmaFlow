@@ -20,11 +20,13 @@ import { sampleBid } from "@/lib/data";
 import { getCounterPriceSuggestion } from "@/app/actions";
 import type { SuggestCounterPriceOutput } from "@/ai/flows/suggest-counter-price";
 import { Wand, Loader2, Lightbulb } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function BiddingOverview() {
   const [isLoading, setIsLoading] = useState(false);
   const [suggestion, setSuggestion] = useState<SuggestCounterPriceOutput | null>(null);
   const [counterPrice, setCounterPrice] = useState("");
+  const { toast } = useToast();
 
   const handleSuggestPrice = async () => {
     setIsLoading(true);
@@ -43,11 +45,38 @@ export function BiddingOverview() {
       setCounterPrice(result.suggestedPrice.toFixed(2));
     } catch (error) {
       console.error("Failed to get suggestion:", error);
-      // Here you would show a toast to the user
+      toast({
+        variant: "destructive",
+        title: "AI Suggestion Failed",
+        description: "Could not retrieve an AI-powered price suggestion.",
+      });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleReject = () => {
+    toast({
+      title: "Bid Rejected",
+      description: `The price bid for ${sampleBid.product.name} has been rejected.`,
+    });
+  };
+
+  const handleAccept = () => {
+    // Here you would also handle the logic for accepting the bid
+    if (counterPrice) {
+      toast({
+        title: "Counter-Offer Sent!",
+        description: `A counter-offer of ${counterPrice} has been sent for ${sampleBid.product.name}.`,
+      });
+    } else {
+      toast({
+        title: "Bid Accepted!",
+        description: `The price bid for ${sampleBid.product.name} has been accepted.`,
+      });
+    }
+  };
+
 
   return (
     <Card>
@@ -125,10 +154,10 @@ export function BiddingOverview() {
         )}
       </CardContent>
       <CardFooter className="flex gap-2">
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" onClick={handleReject}>
           Reject
         </Button>
-        <Button className="w-full">Accept Bid</Button>
+        <Button className="w-full" onClick={handleAccept}>Accept Bid</Button>
       </CardFooter>
     </Card>
   );
