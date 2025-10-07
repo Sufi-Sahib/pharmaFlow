@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { GeoProvider } from '@/context/geo-provider';
 import { I18nProvider } from '@/context/i18n-provider';
 import { useEffect } from 'react';
+import { PageTransitionLoader } from './page-transition-loader';
 
 export function Providers({
   children,
@@ -32,6 +33,7 @@ export function Providers({
   return (
     <I18nProvider dictionary={dictionary} lang={lang}>
       <GeoProvider>
+        <PageTransitionLoader />
         {children}
         <Toaster />
       </GeoProvider>
