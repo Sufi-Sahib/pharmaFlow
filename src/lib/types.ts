@@ -83,6 +83,12 @@ export type SalesReturn = {
   status: "Pending" | "Approved" | "Rejected";
 }
 
+export type SalesTeamMember = {
+    name: string;
+    target: number;
+    achieved: number;
+}
+
 export type AccountSummary = {
   customerName: string;
   creditLimit: number;
@@ -126,6 +132,7 @@ export type AuditLog = {
 type ChartDataItem = {
   name: string;
   value: number;
+  previousValue: number;
 }
 
 type CustomerItem = {
@@ -135,10 +142,21 @@ type CustomerItem = {
     totalValue: number;
 }
 
+type ComparativeMetric = {
+    current: number;
+    previous: number;
+    change: string;
+    changeType: 'increase' | 'decrease';
+}
+
 export type AnalyticsData = {
+    totalRevenue: ComparativeMetric;
+    totalOrders: ComparativeMetric;
+    newCustomers: ComparativeMetric;
+    avgOrderValue: ComparativeMetric;
     topProductsByRevenue: ChartDataItem[];
     topProductsByVolume: ChartDataItem[];
-    topGeographicAreas: ChartDataItem[];
-    topCustomerSegments: ChartDataItem[];
     promisingNewCustomers: CustomerItem[];
 }
+
+    

@@ -7,27 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
+import { salesReturns, salesTeam } from "@/lib/data";
+import { Progress } from "@/components/ui/progress";
 
 const summaryCards = [
     { title: "Total Orders", value: "1,289" },
     { title: "Total Sales", value: "PKR 35,248,050" },
     { title: "Payments Received", value: "PKR 24,198,000" },
 ]
-
-const salesReturns = [
-    { id: "RTN-051", customer: "City Clinic", date: "2023-10-23", amount: 15000.00, status: "Pending" },
-    { id: "RTN-050", customer: "Wellness Pharmacy", date: "2023-10-21", amount: 7550.00, status: "Approved" },
-];
-
-const salesTeam = [
-  { name: "Ali Khan", target: 1500000, achieved: 1250000 },
-  { name: "Fatima Ahmed", target: 2000000, achieved: 2150000 },
-];
 
 const statusColors: { [key: string]: string } = {
     Paid: "bg-green-100 text-green-800",
@@ -132,9 +120,7 @@ function AdminDashboard() {
                   <span className="text-sm font-medium">{member.name}</span>
                   <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
                 </div>
-                 <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                  <div className="bg-primary h-2.5 rounded-full" style={{ width: `${(member.achieved / member.target) * 100}%` }}></div>
-                </div>
+                 <Progress value={(member.achieved / member.target) * 100} />
               </div>
             ))}
           </CardContent>
@@ -157,3 +143,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    

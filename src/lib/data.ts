@@ -1,6 +1,8 @@
 
-import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData, SalesTeamMember } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
+
+export type TimeFrame = '7d' | '30d' | '1y';
 
 export const statsCards: StatCard[] = [
   {
@@ -202,6 +204,11 @@ export const salesReturns: SalesReturn[] = [
   { id: "RTN-050", customer: "Chenab Pharmacy", date: "2023-10-21", invoiceId: "INV-9871", amount: 7550, status: "Approved" },
 ];
 
+export const salesTeam: SalesTeamMember[] = [
+  { name: "Ali Khan", target: 1500000, achieved: 1250000 },
+  { name: "Fatima Ahmed", target: 2000000, achieved: 2150000 },
+];
+
 export const accountSummary: AccountSummary = {
   customerName: "National Hospital, Faisalabad",
   creditLimit: 15000000,
@@ -239,46 +246,90 @@ export const auditLogs: AuditLog[] = [
     { id: '5', timestamp: '2023-10-26 10:20:00', user: 'Ali Clinic', role: 'Customer', action: 'Sales Return Request', details: 'Sales return requested for Invoice #INV-9872', status: 'Pending' },
 ];
 
-export const analyticsData: AnalyticsData = {
-    topProductsByRevenue: [
-        { name: "Atorvastatin 20mg", value: 12500000 },
-        { name: "Metformin 500mg", value: 9800000 },
-        { name: "Amlodipine 5mg", value: 7600000 },
-        { name: "Rosuvastatin 10mg", value: 6500000 },
-        { name: "Panadol 500mg", value: 5400000 },
-        { name: "Ciprofloxacin 500mg", value: 4300000 },
-        { name: "Amoxicillin 250mg", value: 3200000 },
-        { name: "Losartan 50mg", value: 2100000 },
-        { name: "Omeprazole 20mg", value: 1800000 },
-        { name: "Ibuprofen 400mg", value: 1500000 },
-    ],
-    topProductsByVolume: [
-        { name: "Panadol 500mg", value: 50000 },
-        { name: "Metformin 500mg", value: 35000 },
-        { name: "Amoxicillin 250mg", value: 32000 },
-        { name: "Ibuprofen 400mg", value: 28000 },
-        { name: "Amlodipine 5mg", value: 25000 },
-        { name: "Ciprofloxacin 500mg", value: 22000 },
-        { name: "Atorvastatin 20mg", value: 18000 },
-        { name: "Omeprazole 20mg", value: 15000 },
-        { name: "Losartan 50mg", value: 12000 },
-        { name: "Rosuvastatin 10mg", value: 10000 },
-    ],
-    topGeographicAreas: [
-        { name: "Faisalabad", value: 35 },
-        { name: "Lahore", value: 28 },
-        { name: "Gojra", value: 15 },
-        { name: "TTS", value: 12 },
-        { name: "Kamalia", value: 10 },
-    ],
-    topCustomerSegments: [
-        { name: "Pharmacy", value: 60 },
-        { name: "Hospital", value: 25 },
-        { name: "Clinic", value: 15 },
-    ],
-    promisingNewCustomers: [
-        { id: "cust-101", name: "New Life Pharmacy, Lahore", purchases: 5, totalValue: 550000 },
-        { id: "cust-102", name: "Hope Hospital, Faisalabad", purchases: 3, totalValue: 1200000 },
-        { id: "cust-103", name: "Care Clinic, Gojra", purchases: 8, totalValue: 320000 },
-    ]
+function createComparativeMetric<T extends number | string>(current: T, previous: T) {
+    const isNumber = typeof current === 'number' && typeof previous === 'number';
+    let change = 0;
+    if (isNumber && previous > 0) {
+        change = ((current - previous) / previous) * 100;
+    } else if (isNumber && previous === 0 && current > 0) {
+        change = 100;
+    }
+    return {
+        current,
+        previous,
+        change: change.toFixed(1),
+        changeType: change >= 0 ? 'increase' : 'decrease',
+    } as const;
 }
+
+const productPerformance = [
+    { name: "Atorvastatin 20mg", value: 125000, previousValue: 110000 },
+    { name: "Metformin 500mg", value: 98000, previousValue: 105000 },
+    { name: "Amlodipine 5mg", value: 76000, previousValue: 70000 },
+    { name: "Rosuvastatin 10mg", value: 65000, previousValue: 68000 },
+    { name: "Panadol 500mg", value: 54000, previousValue: 45000 },
+    { name: "Ciprofloxacin 500mg", value: 43000, previousValue: 42000 },
+];
+
+export const adminAnalyticsData = {
+    '7d': {
+        totalRevenue: createComparativeMetric(890000, 750000),
+        totalOrders: createComparativeMetric(120, 110),
+        newCustomers: createComparativeMetric(15, 12),
+        avgOrderValue: createComparativeMetric(7416, 6818),
+        topProductsByRevenue: productPerformance.slice(0, 3).map(p => ({ ...p, value: p.value / 4, previousValue: p.previousValue / 4 })),
+        topProductsByVolume: productPerformance.slice(0, 3).map(p => ({ ...p, value: p.value / 500, previousValue: p.previousValue / 500 })),
+        promisingNewCustomers: [{ id: "cust-101", name: "New Life Pharmacy", purchases: 2, totalValue: 150000 }],
+    },
+    '30d': {
+        totalRevenue: createComparativeMetric(4500000, 4200000),
+        totalOrders: createComparativeMetric(580, 550),
+        newCustomers: createComparativeMetric(60, 55),
+        avgOrderValue: createComparativeMetric(7758, 7636),
+        topProductsByRevenue: productPerformance,
+        topProductsByVolume: productPerformance.map(p => ({ ...p, value: Math.round(p.value / 480), previousValue: Math.round(p.previousValue / 480) })),
+        promisingNewCustomers: [
+            { id: "cust-101", name: "New Life Pharmacy, Lahore", purchases: 5, totalValue: 550000 },
+            { id: "cust-102", name: "Hope Hospital, Faisalabad", purchases: 3, totalValue: 1200000 },
+        ],
+    },
+    '1y': {
+        totalRevenue: createComparativeMetric(52000000, 48000000),
+        totalOrders: createComparativeMetric(7000, 6500),
+        newCustomers: createComparativeMetric(500, 450),
+        avgOrderValue: createComparativeMetric(7428, 7384),
+        topProductsByRevenue: productPerformance.map(p => ({ ...p, value: p.value * 12, previousValue: p.previousValue * 12 })),
+        topProductsByVolume: productPerformance.map(p => ({ ...p, value: Math.round(p.value / 450) * 12, previousValue: Math.round(p.previousValue / 450) * 12 })),
+        promisingNewCustomers: [
+            { id: "cust-101", name: "New Life Pharmacy, Lahore", purchases: 5, totalValue: 550000 },
+            { id: "cust-102", name: "Hope Hospital, Faisalabad", purchases: 3, totalValue: 1200000 },
+            { id: "cust-103", name: "Care Clinic, Gojra", purchases: 8, totalValue: 320000 },
+        ]
+    }
+}
+
+export const superAdminAnalyticsData = {
+    '7d': {
+        totalDistributors: createComparativeMetric(128, 125),
+        totalRevenue: createComparativeMetric(15000000, 14000000),
+        totalOrders: createComparativeMetric(2200, 2100),
+        topProductsByRevenue: productPerformance.map(p => ({ ...p, value: p.value * 10, previousValue: p.previousValue * 10 })),
+        salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales / 52, previousValue: d.currentSales / 52 * 0.9 })),
+    },
+    '30d': {
+        totalDistributors: createComparativeMetric(128, 120),
+        totalRevenue: createComparativeMetric(75000000, 72000000),
+        totalOrders: createComparativeMetric(11000, 10500),
+        topProductsByRevenue: productPerformance.map(p => ({ ...p, value: p.value * 50, previousValue: p.previousValue * 50 })),
+        salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales, previousValue: d.currentSales * 0.95 })),
+    },
+    '1y': {
+        totalDistributors: createComparativeMetric(128, 100),
+        totalRevenue: createComparativeMetric(900000000, 850000000),
+        totalOrders: createComparativeMetric(132000, 125000),
+        topProductsByRevenue: productPerformance.map(p => ({ ...p, value: p.value * 600, previousValue: p.previousValue * 600 })),
+        salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales * 12, previousValue: d.currentSales * 12 * 0.9 })),
+    }
+}
+
+    
