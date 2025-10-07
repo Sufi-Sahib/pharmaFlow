@@ -510,32 +510,6 @@ function AdminDashboard() {
           <BiddingOverview />
 
         <div className="lg:col-span-2 space-y-6">
-             <Card>
-              <CardHeader>
-                <CardTitle>Critical Alerts</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <div className="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 rounded-r-lg">
-                  <div className="flex items-center">
-                    <AlertTriangle className="mr-3" />
-                    <div>
-                      <p className="font-bold">Near-Expiry Stock</p>
-                      <p className="text-sm">Panadol 500mg (Batch #P2301) expiring in 15 days.</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r-lg">
-                  <div className="flex items-center">
-                    <AlertCircle className="mr-3" />
-                    <div>
-                      <p className="font-bold">Low Stock Warning</p>
-                      <p className="text-sm">'Metformin 500mg' has only 50 units left.</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
             <Card>
             <CardHeader>
               <CardTitle>Sales Return Requests</CardTitle>
