@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
+import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
 import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -268,7 +268,7 @@ function BookerOrdersView({ booker, orders, onBack, onOrderClick }: { booker: st
 }
 
 
-function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () => void, backView: 'area_details' | 'customer_details' | 'booker_details' | 'invoices' }) {
+function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () => void, backView: 'area_details' | 'customer_details' | 'booker_details' | 'invoices' | 'returns' }) {
     const subtotal = order.items.reduce((acc: number, item: any) => acc + item.total, 0);
     const backButtonText = () => {
         switch(backView) {
@@ -276,6 +276,7 @@ function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () 
             case 'customer_details': return 'Customer Orders';
             case 'booker_details': return 'Booker Orders';
             case 'invoices': return 'Invoices';
+            case 'returns': return 'Sales Returns';
             default: return 'Back';
         }
     }
@@ -343,7 +344,7 @@ function InvoicesDetailView({ onInvoiceClick }: { onInvoiceClick: (orderId: stri
                     <TableRow key={invoice.id} onClick={() => onInvoiceClick(invoice.id)} className="cursor-pointer">
                         <TableCell>{invoice.id}</TableCell>
                         <TableCell>Customer {invoice.id.slice(-1)}</TableCell>
-                        <TableCell><Badge className={statusColors[invoice.status]}>{invoice.status}</Badge></TableCell>
+                        <TableCell><Badge className={cn(statusColors[invoice.status] || 'bg-gray-100 text-gray-800')}>{invoice.status}</Badge></TableCell>
                         <TableCell className="text-right">PKR {invoice.amount.toFixed(2)}</TableCell>
                     </TableRow>
                 ))}
@@ -352,12 +353,43 @@ function InvoicesDetailView({ onInvoiceClick }: { onInvoiceClick: (orderId: stri
     )
 }
 
+function SalesReturnListView({ onReturnClick }: { onReturnClick: (returnId: string) => void }) {
+    return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Return ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {salesReturns.map(r => (
+              <TableRow key={r.id} onClick={() => onReturnClick(r.id)} className="cursor-pointer">
+                <TableCell>{r.id}</TableCell>
+                <TableCell>{r.customer}</TableCell>
+                <TableCell>PKR {r.amount.toFixed(2)}</TableCell>
+                <TableCell><Badge className={statusColors[r.status]}>{r.status}</Badge></TableCell>
+                <TableCell className="text-right">
+                  {r.status === 'Pending' && <Button size="sm" onClick={(e) => e.stopPropagation()}>Approve</Button>}
+                  {r.status === 'Approved' && <span className="text-green-600 font-semibold flex items-center justify-end"><CheckCircle2 className="mr-1 h-4 w-4" /> Done</span>}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+    );
+}
+
 
 function AdminDashboard() {
     const [openCard, setOpenCard] = useState<string | null>(null);
     const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
     const [salesDetailState, setSalesDetailState] = useState({ view: 'list', orderId: ''});
     const [paymentsDetailState, setPaymentsDetailState] = useState({ view: 'list', orderId: ''});
+    const [salesReturnDetailState, setSalesReturnDetailState] = useState({ view: 'list', returnId: '' });
 
     const handleCardToggle = (cardTitle: string) => {
         setOpenCard(current => {
@@ -378,6 +410,7 @@ function AdminDashboard() {
             setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
             setSalesDetailState({ view: 'list', orderId: '' });
             setPaymentsDetailState({ view: 'list', orderId: '' });
+            setSalesReturnDetailState({ view: 'list', returnId: ''});
             return cardTitle;
         });
     }
@@ -442,6 +475,27 @@ function AdminDashboard() {
                     />
         }
         return <InvoicesDetailView onInvoiceClick={(orderId) => setPaymentsDetailState({ view: 'invoice_detail', orderId })} />
+    }
+
+    const renderSalesReturnContent = () => {
+        if (salesReturnDetailState.view === 'detail') {
+            const selectedReturn = salesReturns.find(r => r.id === salesReturnDetailState.returnId) || { customer: 'Unknown', id: 'Unknown', date: ''};
+            const mockOrderForReturn = {
+                ...selectedOrderData,
+                id: selectedReturn.id,
+                customer: selectedReturn.customer,
+                date: selectedReturn.date,
+                // Items would need to be fetched based on the return
+            };
+            return (
+                <OrderInvoiceView 
+                    order={mockOrderForReturn}
+                    onBack={() => setSalesReturnDetailState({ view: 'list', returnId: '' })}
+                    backView="returns"
+                />
+            );
+        }
+        return <SalesReturnListView onReturnClick={(returnId) => setSalesReturnDetailState({ view: 'detail', returnId })} />;
     }
   
   return (
@@ -511,40 +565,16 @@ function AdminDashboard() {
 
         <div className="lg:col-span-2 space-y-6">
             <Card>
-            <CardHeader>
-              <CardTitle>Sales Return Requests</CardTitle>
-              <CardDescription>Approve or reject customer return requests.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Return ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {salesReturns.map(r => (
-                      <TableRow key={r.id}>
-                        <TableCell>{r.id}</TableCell>
-                        <TableCell>{r.customer}</TableCell>
-                        <TableCell>PKR {r.amount.toFixed(2)}</TableCell>
-                        <TableCell><Badge className={statusColors[r.status]}>{r.status}</Badge></TableCell>
-                        <TableCell className="text-right">
-                          {r.status === 'Pending' && <Button size="sm">Approve</Button>}
-                          {r.status === 'Approved' && <span className="text-green-600 font-semibold flex items-center justify-end"><CheckCircle2 className="mr-1 h-4 w-4" /> Done</span>}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+                <CardHeader>
+                    <CardTitle>Sales Return Requests</CardTitle>
+                    <CardDescription>Approve or reject customer return requests.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="overflow-x-auto">
+                        {renderSalesReturnContent()}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
         <Card className="lg:col-span-3">
           <CardHeader>
@@ -580,3 +610,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    
