@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { openDB, addToQueue, getQueuedEvents, removeFromQueue } from '@/lib/db';
+import { addToQueue, getQueuedEvents, removeFromQueue } from '@/lib/db';
 
 type GeoLocation = {
   latitude: number;
@@ -85,13 +85,13 @@ export function useGeoLocation() {
   }, [isSyncing]);
 
   useEffect(() => {
-    window.addEventListener('online', syncOfflineEvents);
+    window.addEventListener('online', () => syncOfflineEvents());
     // Attempt a sync on initial load in case we were offline before
     if(navigator.onLine) {
         syncOfflineEvents();
     }
     return () => {
-      window.removeEventListener('online', syncOfflineEvents);
+      window.removeEventListener('online', () => syncOfflineEvents());
     };
   }, [syncOfflineEvents]);
 
