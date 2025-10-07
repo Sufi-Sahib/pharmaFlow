@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText, LocateFixed, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Truck, FileText, LocateFixed, AlertTriangle, Undo2 } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -67,9 +67,9 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
 
     const handlePayment = async (method: string, details: any) => {
         const result = await stampAction(`payment_${method}`, { orderId: task.id, ...details });
-         if (result.queued) {
+         if (result.status === 'queued') {
             toast({ title: "Offline", description: `Payment action queued.` });
-        } else if (result.success) {
+        } else if (result.status === 'success') {
             toast({ title: "Payment Confirmed!", description: "Transaction has been logged." });
         } else {
             toast({ title: "Sync Error", description: `Could not sync payment. It has been queued.`, variant: "destructive" });
@@ -109,7 +109,7 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
                 </CardContent>
                  <CardFooter className="flex gap-2">
                     <Button variant="outline" onClick={() => setIsReturning(false)} className="w-full">Cancel</Button>
-                    <Button onClick={() => { setIsReturning(false); setIsConfirmed(true); }} className="w-full">Confirm Return</Button>
+                    <Button onClick={() => { setIsReturning(false); handlePayment('return_on_spot', { amount: 0 }); }} className="w-full">Confirm Return</Button>
                 </CardFooter>
             </Card>
         )

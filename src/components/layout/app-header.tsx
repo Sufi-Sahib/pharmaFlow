@@ -1,26 +1,8 @@
 'use client';
 
-import {
-  Bell,
-  Home,
-  LineChart,
-  Package,
-  Package2,
-  Search,
-  ShoppingCart,
-  Users,
-} from 'lucide-react';
-
+import { Bell, Home, LineChart, Loader2, Package, Package2, Search, ShoppingCart, Users, Wifi, WifiOff } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,17 +11,65 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useGeo } from '@/context/geo-provider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export function AppHeader() {
+  const { status } = useGeo();
+
+  const getStatusIcon = () => {
+    switch (status) {
+      case 'syncing':
+        return {
+          Icon: Loader2,
+          className: 'animate-spin text-blue-500',
+          tooltip: 'Syncing offline data...',
+        };
+      case 'offline':
+        return {
+          Icon: WifiOff,
+          className: 'text-red-500',
+          tooltip: 'Offline. Actions are being queued.',
+        };
+      case 'error':
+         return {
+          Icon: WifiOff,
+          className: 'text-red-500',
+          tooltip: 'Syncing error. Please check connection.',
+        };
+      default:
+        return {
+          Icon: Wifi,
+          className: 'text-green-500',
+          tooltip: 'Online and synced.',
+        };
+    }
+  };
+
+  const { Icon, className, tooltip } = getStatusIcon();
+
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
       <SidebarTrigger className="h-6 w-6" />
       <div className="w-full flex-1">
         <h1 className="font-headline text-lg font-semibold">Super Admin Dashboard</h1>
       </div>
+
+       <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <Icon className={className} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">

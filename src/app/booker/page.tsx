@@ -16,18 +16,19 @@ import { customers, productsWithBatches as products } from "@/lib/data";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useGeoLocation } from "@/hooks/use-geo-location";
 import { useToast } from "@/hooks/use-toast";
+import { useGeo } from "@/context/geo-provider";
 
 function BookerHome() {
   const [view, setView] = useState("home");
   const { toast } = useToast();
-  const { location, error, stampAction, loading } = useGeoLocation();
+  const { lastLocation, error, loading, stampAction } = useGeoLocation();
 
   const handleCheckIn = async () => {
     const result = await stampAction("route_check_in", { customerId: "all" });
-    if (result.queued) {
+    if (result.status === 'queued') {
       toast({ title: "Offline", description: "Check-in action queued." });
-    } else if (result.success) {
-      toast({ title: "Checked In!", description: `Stamped at: ${location?.latitude}, ${location?.longitude}` });
+    } else if (result.status === 'success') {
+      toast({ title: "Checked In!", description: `Stamped at: ${lastLocation?.latitude}, ${lastLocation?.longitude}` });
     } else {
         toast({ title: "Sync Error", description: "Could not sync check-in. It has been queued.", variant: "destructive" });
     }
@@ -35,9 +36,9 @@ function BookerHome() {
 
   const handleCheckOut = async () => {
     const result = await stampAction("route_check_out", { customerId: "all" });
-    if (result.queued) {
+    if (result.status === 'queued') {
       toast({ title: "Offline", description: "Check-out action queued." });
-    } else if (result.success) {
+    } else if (result.status === 'success') {
       toast({ title: "Checked Out!", description: "Route concluded." });
     } else {
         toast({ title: "Sync Error", description: "Could not sync check-out. It has been queued.", variant: "destructive" });
@@ -78,7 +79,7 @@ function BookerHome() {
                         <Button className="w-full" variant="outline" onClick={handleCheckIn} disabled={loading}>{loading ? 'Stamping...' : 'Check-In (Stamp Location)'}</Button>
                         <Button className="w-full" variant="outline" onClick={handleCheckOut} disabled={loading}>{loading ? 'Stamping...' : 'Check-Out'}</Button>
                     </div>
-                    {location && <p className="text-xs text-center text-muted-foreground">Last stamp: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>}
+                    {lastLocation && <p className="text-xs text-center text-muted-foreground">Last stamp: {lastLocation.latitude.toFixed(4)}, {lastLocation.longitude.toFixed(4)}</p>}
                 </CardContent>
             </Card>
         </div>
@@ -108,10 +109,11 @@ function BookerHome() {
 }
 
 function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
-    const [isOnline, setIsOnline] = useState(true);
+    const { status: geoStatus } = useGeo();
+    const isOnline = geoStatus === 'online' || geoStatus === 'syncing';
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
     const { toast } = useToast();
-    const { stampAction, loading } = useGeoLocation();
+    const { loading, stampAction } = useGeoLocation();
     
     const handleQuantityChange = (productName: string, quantity: number) => {
         setQuantities(prev => ({...prev, [productName]: Math.max(0, quantity)}));
@@ -130,9 +132,9 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
         
         const result = await stampAction("order_create_submit", { items: orderItems });
         
-        if (result.queued) {
+        if (result.status === 'queued') {
           toast({ title: "Offline", description: "Order saved locally and will be synced when online." });
-        } else if (result.success) {
+        } else if (result.status === 'success') {
           toast({ title: "Order Submitted!", description: "The order has been successfully submitted." });
         } else {
             toast({ title: "Sync Error", description: "Could not submit order. It has been queued for later.", variant: "destructive" });
@@ -144,11 +146,6 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <CardTitle>Place New Order</CardTitle>
-                <div className="flex items-center space-x-2">
-                    {isOnline ? <Wifi className="text-green-500" /> : <WifiOff className="text-red-500" />}
-                    <Label htmlFor="online-status">{isOnline ? "Online" : "Offline"}</Label>
-                    <Switch id="online-status" checked={isOnline} onCheckedChange={setIsOnline} />
-                </div>
             </div>
 
             {!isOnline && (

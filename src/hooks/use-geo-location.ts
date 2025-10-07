@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { addToQueue, getQueuedEvents, removeFromQueue } from '@/lib/db';
+import { useGeo } from '@/context/geo-provider';
 
 type GeoLocation = {
   latitude: number;
@@ -39,21 +40,24 @@ async function sendToServer(data: StampedAction): Promise<{success: boolean}> {
 
 
 export function useGeoLocation() {
-  const [location, setLocation] = useState<GeoLocation | null>(null);
+  const { setStatus, setHasQueuedItems, lastLocation, setLastLocation } = useGeo();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
 
   const syncOfflineEvents = useCallback(async (retryCount = 0) => {
-    if (isSyncing) return;
+    if (isSyncing || !navigator.onLine) return;
     setIsSyncing(true);
+    setStatus('syncing');
     console.log("Starting sync process...");
 
     try {
         const queuedEvents = await getQueuedEvents();
+        setHasQueuedItems(queuedEvents.length > 0);
         if (queuedEvents.length === 0) {
             console.log("No events to sync.");
+            setStatus('online');
             setIsSyncing(false);
             return;
         }
@@ -65,12 +69,16 @@ export function useGeoLocation() {
             if (success) {
                 await removeFromQueue(event.id);
                 console.log(`Event ${event.id} synced and removed from queue.`);
+                 const remainingEvents = await getQueuedEvents();
+                 setHasQueuedItems(remainingEvents.length > 0);
             } else {
                  throw new Error("Sync failed, will retry later.");
             }
         }
+        setStatus('online');
     } catch (e: any) {
         console.error(e.message);
+        setStatus('error');
         const maxRetries = 5;
         if (retryCount < maxRetries) {
             const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
@@ -82,18 +90,23 @@ export function useGeoLocation() {
     } finally {
         setIsSyncing(false);
     }
-  }, [isSyncing]);
+  }, [isSyncing, setStatus, setHasQueuedItems]);
 
   useEffect(() => {
-    window.addEventListener('online', () => syncOfflineEvents());
-    // Attempt a sync on initial load in case we were offline before
+    const handleOnline = () => syncOfflineEvents();
+    window.addEventListener('online', handleOnline);
+
     if(navigator.onLine) {
         syncOfflineEvents();
+    } else {
+        setStatus('offline');
+        getQueuedEvents().then(events => setHasQueuedItems(events.length > 0));
     }
+
     return () => {
-      window.removeEventListener('online', () => syncOfflineEvents());
+      window.removeEventListener('online', handleOnline);
     };
-  }, [syncOfflineEvents]);
+  }, [syncOfflineEvents, setStatus, setHasQueuedItems]);
 
   const stampAction = useCallback(async (actionType: string, payload: any) => {
     setLoading(true);
@@ -112,7 +125,7 @@ export function useGeoLocation() {
                     accuracy: position.coords.accuracy,
                     timestamp: position.timestamp,
                 };
-                setLocation(loc);
+                setLastLocation(loc);
                 resolve(loc);
             },
             (err) => {
@@ -149,7 +162,9 @@ export function useGeoLocation() {
     if (!navigator.onLine) {
         console.log("Offline. Queuing action.");
         await addToQueue(stampedAction);
-        return { queued: true };
+        setHasQueuedItems(true);
+        setStatus('offline');
+        return { status: 'queued' };
     }
 
     try {
@@ -157,14 +172,17 @@ export function useGeoLocation() {
         if (!success) {
             throw new Error("Server request failed, queuing event.");
         }
-        return { success: true };
+        syncOfflineEvents(); // Check for any other queued items
+        return { status: 'success' };
     } catch (e) {
         console.log("Failed to send to server, queuing action.");
         await addToQueue(stampedAction);
-        return { queued: true };
+        setHasQueuedItems(true);
+        setStatus('offline');
+        return { status: 'queued' };
     }
 
-  }, []);
+  }, [setLastLocation, setStatus, setHasQueuedItems, syncOfflineEvents]);
 
-  return { location, error, loading, isSyncing, stampAction };
+  return { lastLocation, error, loading, stampAction };
 }
