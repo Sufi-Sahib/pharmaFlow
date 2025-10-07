@@ -18,6 +18,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; onUpdate: (id: string, updates: Partial<Distributor>) => void; }) {
+  const [isApprovalDialogOpen, setIsApprovalDialogOpen] = useState(false);
+  const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
+  const [kycConfirmed, setKycConfirmed] = useState(false);
+
   const statusColors: { [key: string]: string } = {
     Approved: "bg-green-100 text-green-800",
     Pending: "bg-yellow-100 text-yellow-800",
@@ -29,10 +33,14 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
 
   const handleStatusChange = (newStatus: Distributor['status']) => {
     onUpdate(distributor.id, { status: newStatus });
+    if(newStatus === 'Approved') {
+        setIsApprovalDialogOpen(false);
+    }
   };
   
   const handlePackageChange = (newPackage: Distributor['package']) => {
      onUpdate(distributor.id, { package: newPackage });
+     setIsPackageDialogOpen(false);
   }
 
   return (
@@ -83,7 +91,7 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
       <CardFooter className="flex flex-col gap-2">
         <div className="flex w-full gap-2">
           {distributor.status === "Pending" && (
-              <Dialog>
+              <Dialog open={isApprovalDialogOpen} onOpenChange={setIsApprovalDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" className="w-full">Approve</Button>
                 </DialogTrigger>
@@ -128,12 +136,12 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
                     </div>
                      <DialogFooter>
                         <div className="flex items-center space-x-2">
-                           <Checkbox id="terms" />
+                           <Checkbox id="terms" checked={kycConfirmed} onCheckedChange={(checked) => setKycConfirmed(checked as boolean)} />
                            <label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            I confirm all details have been reviewed and verified.
+                            I confirm all KYC details have been reviewed and verified.
                            </label>
                         </div>
-                        <Button onClick={() => handleStatusChange('Approved')}>Confirm & Approve</Button>
+                        <Button onClick={() => handleStatusChange('Approved')} disabled={!kycConfirmed}>Confirm & Approve</Button>
                     </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -142,7 +150,7 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
           {distributor.status === "Suspended" && <Button onClick={() => handleStatusChange('Approved')} size="sm" className="w-full">Re-activate</Button>}
         </div>
          <div className="w-full">
-            <Dialog>
+            <Dialog open={isPackageDialogOpen} onOpenChange={setIsPackageDialogOpen}>
                 <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="w-full">Change Package</Button>
                 </DialogTrigger>
@@ -165,7 +173,7 @@ function DistributorCard({ distributor, onUpdate }: { distributor: Distributor; 
                         </Select>
                     </div>
                     <DialogFooter>
-                        <Button>Save Changes</Button>
+                        <Button onClick={() => setIsPackageDialogOpen(false)}>Save Changes</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
