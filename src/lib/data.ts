@@ -270,24 +270,24 @@ export const deliveryStaff = [
     { id: 'staff-1', name: 'Zainab Mir' },
     { id: 'staff-2', name: 'Umar Farooq' },
     { id: 'staff-3', name: 'Ayesha Khan' },
-]
+];
 
 export const accountSummary: AccountSummary = {
   customerName: "National Hospital, Faisalabad",
-  creditLimit: 15000000,
-  currentBalance: 4820500,
+  creditLimit: 1500000,
+  currentBalance: 482050,
   aging: {
-    current: 2500000,
-    '30-60': 1500500,
-    '60-90': 820000,
+    current: 250000,
+    '30-60': 150050,
+    '60-90': 82000,
     '90+': 0
   }
 };
 
 export const mockInvoices: Invoice[] = [
-    { id: "ORD-9872", date: "2023-10-22", dueDate: "2023-11-21", amount: 450000.00, status: "Paid" },
-    { id: "ORD-9871", date: "2023-10-21", dueDate: "2023-11-20", amount: 1250000.00, status: "Due in 15 days" },
-    { id: "ORD-9869", date: "2023-09-19", dueDate: "2023-10-19", amount: 820000.00, status: "Overdue by 34 days" },
+    { id: "ORD-9872", date: "2023-10-22", dueDate: "2024-09-21", amount: 450000.00, status: "Paid" },
+    { id: "ORD-9871", date: "2023-10-21", dueDate: "2024-08-20", amount: 1250000.00, status: "Due in 15 days" },
+    { id: "ORD-9869", date: "2023-09-19", dueDate: "2024-06-19", amount: 820000.00, status: "Overdue by 34 days" },
     { id: "ORD-9865", date: "2023-08-15", dueDate: "2023-09-14", amount: 720000.00, status: "Paid" },
 ];
 
@@ -451,3 +451,5 @@ export const superAdminAnalyticsData = {
         salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales * 12, previousValue: d.currentSales * 12 * 0.9 })),
     }
 }
+
+    
