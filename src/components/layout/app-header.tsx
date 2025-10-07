@@ -14,6 +14,7 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useGeo } from '@/context/geo-provider';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { PushNotificationManager } from '@/components/notifications/PushNotificationManager';
 
 export function AppHeader() {
   const { status } = useGeo();
@@ -69,6 +70,8 @@ export function AppHeader() {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+
+      <PushNotificationManager />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
