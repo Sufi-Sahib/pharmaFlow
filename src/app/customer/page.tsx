@@ -180,6 +180,7 @@ function CustomerLedgerCard({ onInvoiceClick }: { onInvoiceClick: (invoiceId: st
 }
 
 function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
+    const { toast } = useToast();
     return (
         <Card className="flex flex-col">
             <CardContent className="p-4 flex-grow">
@@ -244,7 +245,7 @@ function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="desiredPrice" className="text-right">Desired Price</Label>
-                                <Input id="desiredPrice" type="number" className="col-span-3" placeholder="PKR 1800.00" />
+                                <Input id="desiredPrice" type="number" className="col-span-3" placeholder="PKR 1800.00" defaultValue={product.lastOrder?.price.toFixed(2)} />
                             </div>
                              <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="reason" className="text-right">Reason</Label>
@@ -257,7 +258,17 @@ function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
                     </DialogContent>
                 </Dialog>
                 
-                <Button size="sm" className="w-full" disabled={!product.inStock}>
+                <Button 
+                    size="sm" 
+                    className="w-full" 
+                    disabled={!product.inStock}
+                    onClick={() => {
+                        toast({
+                            title: "Added to Cart",
+                            description: `${product.name} has been added to your cart.`
+                        })
+                    }}
+                >
                      {product.inStock ? <><ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart</> : 'Out of Stock'}
                 </Button>
             </CardFooter>
@@ -577,5 +588,3 @@ export default function CustomerPage() {
         </SidebarProvider>
     );
 }
-
-    

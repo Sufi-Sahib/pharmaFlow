@@ -214,7 +214,12 @@ export const productsWithBatches: Product[] = [
         stock: 80,
         batches: [
             { batchNumber: "M456", expiryDate: "2024-08-31", stock: 80 }
-        ]
+        ],
+        lastOrder: {
+            quantity: 100,
+            date: "2023-09-20",
+            price: 1550,
+        }
     },
     {
         name: "Atorvastatin 20mg",
@@ -239,7 +244,12 @@ export const productsWithBatches: Product[] = [
         stock: 1000,
         batches: [
              { batchNumber: "P789", expiryDate: "2025-10-31", stock: 1000 }
-        ]
+        ],
+         lastOrder: {
+            quantity: 200,
+            date: "2023-09-25",
+            price: 490,
+        }
     },
 ];
 
