@@ -221,7 +221,7 @@ export const accountSummary: AccountSummary = {
   }
 };
 
-export const invoices: Invoice[] = [
+export const mockInvoices: Invoice[] = [
     { id: "ORD-9872", date: "2023-10-22", dueDate: "2023-11-21", amount: 450000.00, status: "Paid" },
     { id: "ORD-9871", date: "2023-10-21", dueDate: "2023-11-20", amount: 1250000.00, status: "Due in 15 days" },
     { id: "ORD-9869", date: "2023-09-19", dueDate: "2023-10-19", amount: 820000.00, status: "Overdue by 34 days" },

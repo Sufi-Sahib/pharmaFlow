@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
-import { salesReturns, salesTeam, invoices as mockInvoices, type Order } from "@/lib/data";
+import { salesReturns, salesTeam, mockInvoices, type Order } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -51,6 +51,16 @@ const areaOrders = {
     ]
 }
 
+const customerOrders = {
+    "Ali Clinic": [
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
+        { id: "ORD-9865", customer: "Ali Clinic", booker: "Ali Khan", amount: 320000.00, status: "Delivered" },
+    ],
+    "National Hospital": [
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+    ]
+}
+
 const selectedOrderData = {
     id: "ORD-9872",
     customer: "Ali Clinic",
@@ -65,7 +75,7 @@ const selectedOrderData = {
     ]
 }
 
-function OrdersDetailView({ onAreaClick, onOrderClick }: { onAreaClick: (area: string) => void, onOrderClick: (orderId: string) => void }) {
+function OrdersDetailView({ onAreaClick, onCustomerClick, onOrderClick }: { onAreaClick: (area: string) => void, onCustomerClick: (customer: string) => void, onOrderClick: (orderId: string) => void }) {
     return (
         <Tabs defaultValue="area">
             <TabsList className="grid w-full grid-cols-3">
@@ -106,11 +116,11 @@ function OrdersDetailView({ onAreaClick, onOrderClick }: { onAreaClick: (area: s
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
+                        <TableRow onClick={() => onCustomerClick("Ali Clinic")} className="cursor-pointer">
                             <TableCell>Ali Clinic</TableCell>
                             <TableCell className="text-right">102</TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow onClick={() => onCustomerClick("National Hospital")} className="cursor-pointer">
                             <TableCell>National Hospital</TableCell>
                             <TableCell className="text-right">88</TableCell>
                         </TableRow>
@@ -192,11 +202,63 @@ function AreaOrdersView({ area, orders, onBack, onOrderClick }: { area: string, 
     )
 }
 
-function OrderInvoiceView({ order, onBack }: { order: any, onBack: () => void }) {
+function CustomerOrdersView({ customer, orders, onBack, onOrderClick }: { customer: string, orders: Order[], onBack: () => void, onOrderClick: (orderId: string) => void }) {
+    const [statusFilter, setStatusFilter] = useState('All');
+    
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => statusFilter === 'All' || order.status === statusFilter);
+    }, [orders, statusFilter]);
+    
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-4">
+                <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Summary</Button>
+                <div className="flex items-center gap-2">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="All">All Statuses</SelectItem>
+                            <SelectItem value="Delivered">Delivered</SelectItem>
+                            <SelectItem value="Shipped">Shipped</SelectItem>
+                            <SelectItem value="Processing">Processing</SelectItem>
+                            <SelectItem value="Pending">Pending</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            <CardTitle className="mb-4">Orders for {customer}</CardTitle>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Booker</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {filteredOrders.map(order => (
+                        <TableRow key={order.id} onClick={() => onOrderClick(order.id)} className="cursor-pointer">
+                            <TableCell>{order.id}</TableCell>
+                            <TableCell>{order.booker}</TableCell>
+                            <TableCell><Badge className={statusColors[order.status]}>{order.status}</Badge></TableCell>
+                            <TableCell className="text-right">PKR {order.amount.toFixed(2)}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+}
+
+
+function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () => void, backView: 'area_details' | 'customer_details' }) {
     const subtotal = order.items.reduce((acc: number, item: any) => acc + item.total, 0);
     return (
         <div>
-             <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Area Orders</Button>
+             <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to {backView === 'area_details' ? 'Area Orders' : 'Customer Orders'}</Button>
              <Card>
                  <CardHeader>
                      <CardTitle>Order {order.id}</CardTitle>
@@ -269,20 +331,20 @@ function InvoicesDetailView() {
 
 function AdminDashboard() {
     const [openCard, setOpenCard] = useState<string | null>(null);
-    const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', orderId: '' });
+    const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', customer: '', orderId: '' });
 
     const handleCardToggle = (cardTitle: string) => {
         setOpenCard(current => {
             if (current === cardTitle) {
                 if (cardTitle === summaryData.totalOrders.title) {
-                    setOrderDetailState({ view: 'tabs', area: '', orderId: '' });
+                    setOrderDetailState({ view: 'tabs', area: '', customer: '', orderId: '' });
                 }
                 return null;
             }
             return cardTitle;
         });
         if (cardTitle === summaryData.totalOrders.title) {
-           setOrderDetailState({ view: 'tabs', area: '', orderId: '' });
+           setOrderDetailState({ view: 'tabs', area: '', customer: '', orderId: '' });
         }
     }
 
@@ -292,19 +354,29 @@ function AdminDashboard() {
                 return <AreaOrdersView 
                             area={orderDetailState.area} 
                             orders={areaOrders[orderDetailState.area as keyof typeof areaOrders] || []}
-                            onBack={() => setOrderDetailState({ view: 'tabs', area: '', orderId: '' })}
+                            onBack={() => setOrderDetailState({ view: 'tabs', area: '', customer: '', orderId: '' })}
+                            onOrderClick={(orderId) => setOrderDetailState(s => ({ ...s, view: 'order_invoice', orderId }))}
+                        />;
+            case 'customer_details':
+                return <CustomerOrdersView
+                            customer={orderDetailState.customer}
+                            orders={customerOrders[orderDetailState.customer as keyof typeof customerOrders] || []}
+                            onBack={() => setOrderDetailState({ view: 'tabs', area: '', customer: '', orderId: '' })}
                             onOrderClick={(orderId) => setOrderDetailState(s => ({ ...s, view: 'order_invoice', orderId }))}
                         />;
             case 'order_invoice':
+                const backView = orderDetailState.area ? 'area_details' : 'customer_details';
                 return <OrderInvoiceView 
                             order={selectedOrderData}
-                            onBack={() => setOrderDetailState(s => ({ ...s, view: 'area_details', orderId: '' }))}
+                            onBack={() => setOrderDetailState(s => ({ ...s, view: backView, orderId: '' }))}
+                            backView={backView}
                         />;
             case 'tabs':
             default:
                 return <OrdersDetailView 
-                            onAreaClick={(area) => setOrderDetailState({ view: 'area_details', area, orderId: '' })}
-                            onOrderClick={(orderId) => setOrderDetailState({ view: 'order_invoice', area: '', orderId })}
+                            onAreaClick={(area) => setOrderDetailState({ view: 'area_details', area, customer: '', orderId: '' })}
+                            onCustomerClick={(customer) => setOrderDetailState({ view: 'customer_details', customer, area: '', orderId: '' })}
+                            onOrderClick={(orderId) => setOrderDetailState({ view: 'order_invoice', area: '', customer: '', orderId })}
                         />;
         }
     }
@@ -471,5 +543,3 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
-
-    
