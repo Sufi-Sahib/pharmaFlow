@@ -383,6 +383,57 @@ function SalesReturnListView({ onReturnClick }: { onReturnClick: (returnId: stri
     );
 }
 
+function SalesTeamMemberDetailView({ member, onBack }: { member: any, onBack: () => void }) {
+    const progress = (member.achieved / member.target) * 100;
+    return (
+        <div>
+            <Button variant="ghost" onClick={onBack} className="mb-4"><ArrowLeft className="mr-2" /> Back to Team</Button>
+            <div className="mb-4">
+                <CardTitle>{member.name}</CardTitle>
+                <div className="flex justify-between mt-1">
+                  <span className="text-sm font-medium">Sales Target</span>
+                  <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
+                </div>
+                 <Progress value={progress} className="mt-1" />
+            </div>
+
+            <Tabs defaultValue="invoices">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="invoices">Invoices</TabsTrigger>
+                    <TabsTrigger value="returns">Sales Returns</TabsTrigger>
+                </TabsList>
+                <TabsContent value="invoices">
+                    <Table>
+                        <TableHeader><TableRow><TableHead>Invoice ID</TableHead><TableHead>Customer</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Amount</TableHead></TableRow></TableHeader>
+                        <TableBody>
+                            {mockInvoices.slice(0,2).map(invoice => (
+                                <TableRow key={invoice.id}>
+                                    <TableCell>{invoice.id}</TableCell><TableCell>Customer {invoice.id.slice(-1)}</TableCell>
+                                    <TableCell><Badge className={cn(statusColors[invoice.status] || 'bg-gray-100 text-gray-800')}>{invoice.status}</Badge></TableCell>
+                                    <TableCell className="text-right">PKR {invoice.amount.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TabsContent>
+                <TabsContent value="returns">
+                     <Table>
+                        <TableHeader><TableRow><TableHead>Return ID</TableHead><TableHead>Customer</TableHead><TableHead>Amount</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
+                        <TableBody>
+                            {salesReturns.slice(0,1).map(r => (
+                                <TableRow key={r.id}>
+                                    <TableCell>{r.id}</TableCell><TableCell>{r.customer}</TableCell>
+                                    <TableCell>PKR {r.amount.toFixed(2)}</TableCell>
+                                    <TableCell><Badge className={statusColors[r.status]}>{r.status}</Badge></TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TabsContent>
+            </Tabs>
+        </div>
+    )
+}
 
 function AdminDashboard() {
     const [openCard, setOpenCard] = useState<string | null>(null);
@@ -390,27 +441,23 @@ function AdminDashboard() {
     const [salesDetailState, setSalesDetailState] = useState({ view: 'list', orderId: ''});
     const [paymentsDetailState, setPaymentsDetailState] = useState({ view: 'list', orderId: ''});
     const [salesReturnDetailState, setSalesReturnDetailState] = useState({ view: 'list', returnId: '' });
+    const [salesTeamDetailState, setSalesTeamDetailState] = useState<{ view: 'list' | 'detail', memberName: string | null }>({ view: 'list', memberName: null });
 
     const handleCardToggle = (cardTitle: string) => {
         setOpenCard(current => {
             if (current === cardTitle) {
                 // If clicking the same card, reset its detail view state
-                if (cardTitle === summaryData.totalOrders.title) {
-                    setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
-                }
-                 if (cardTitle === summaryData.totalSales.title) {
-                    setSalesDetailState({ view: 'list', orderId: '' });
-                }
-                if (cardTitle === summaryData.paymentsReceived.title) {
-                    setPaymentsDetailState({ view: 'list', orderId: '' });
-                }
+                if (cardTitle === summaryData.totalOrders.title) setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
+                if (cardTitle === summaryData.totalSales.title) setSalesDetailState({ view: 'list', orderId: '' });
+                if (cardTitle === summaryData.paymentsReceived.title) setPaymentsDetailState({ view: 'list', orderId: '' });
                 return null;
             }
-             // Reset states when switching to a new card
+            // Reset states when switching to a new card
             setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
             setSalesDetailState({ view: 'list', orderId: '' });
             setPaymentsDetailState({ view: 'list', orderId: '' });
             setSalesReturnDetailState({ view: 'list', returnId: ''});
+            setSalesTeamDetailState({ view: 'list', memberName: null });
             return cardTitle;
         });
     }
@@ -485,7 +532,6 @@ function AdminDashboard() {
                 id: selectedReturn.id,
                 customer: selectedReturn.customer,
                 date: selectedReturn.date,
-                // Items would need to be fetched based on the return
             };
             return (
                 <OrderInvoiceView 
@@ -496,6 +542,28 @@ function AdminDashboard() {
             );
         }
         return <SalesReturnListView onReturnClick={(returnId) => setSalesReturnDetailState({ view: 'detail', returnId })} />;
+    }
+
+    const renderSalesTeamContent = () => {
+        if (salesTeamDetailState.view === 'detail') {
+            const member = salesTeam.find(m => m.name === salesTeamDetailState.memberName);
+            if (!member) return null;
+            return <SalesTeamMemberDetailView member={member} onBack={() => setSalesTeamDetailState({ view: 'list', memberName: null })} />;
+        }
+        
+        return (
+            <div className="grid gap-6 sm:grid-cols-2">
+            {salesTeam.map(member => (
+              <div key={member.name} className="cursor-pointer" onClick={() => setSalesTeamDetailState({ view: 'detail', memberName: member.name })}>
+                <div className="flex justify-between mb-1">
+                  <span className="text-sm font-medium">{member.name}</span>
+                  <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
+                </div>
+                 <Progress value={(member.achieved / member.target) * 100} />
+              </div>
+            ))}
+          </div>
+        );
     }
   
   return (
@@ -580,16 +648,8 @@ function AdminDashboard() {
           <CardHeader>
             <CardTitle>Sales Team Performance</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-6 sm:grid-cols-2">
-            {salesTeam.map(member => (
-              <div key={member.name}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">{member.name}</span>
-                  <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
-                </div>
-                 <Progress value={(member.achieved / member.target) * 100} />
-              </div>
-            ))}
+          <CardContent>
+            {renderSalesTeamContent()}
           </CardContent>
         </Card>
       </div>
