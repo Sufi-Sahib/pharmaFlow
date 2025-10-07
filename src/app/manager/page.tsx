@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState } from "react";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { BiddingOverview } from "@/components/dashboard/bidding-overview";
@@ -7,15 +10,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2 } from "lucide-react";
-import { salesReturns, salesTeam } from "@/lib/data";
+import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown } from "lucide-react";
+import { salesReturns, salesTeam, invoices as mockInvoices } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
-const summaryCards = [
-    { title: "Total Orders", value: "1,289" },
-    { title: "Total Sales", value: "PKR 35,248,050" },
-    { title: "Payments Received", value: "PKR 24,198,000" },
-]
+const summaryData = {
+    totalOrders: { title: "Total Orders", value: "1,289" },
+    totalSales: { title: "Total Sales", value: "PKR 35,248,050" },
+    paymentsReceived: { title: "Payments Received", value: "PKR 24,198,000" },
+}
 
 const statusColors: { [key: string]: string } = {
     Paid: "bg-green-100 text-green-800",
@@ -25,22 +31,178 @@ const statusColors: { [key: string]: string } = {
     Shipped: "bg-purple-100 text-purple-800",
     Processing: "bg-gray-100 text-gray-800",
     Approved: "bg-green-100 text-green-800",
+    "Due in 15 days": "bg-yellow-100 text-yellow-800",
+    "Overdue by 34 days": "bg-red-100 text-red-800",
 }
 
+function OrdersDetailView() {
+    return (
+        <Tabs defaultValue="area">
+            <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="area">By Area</TabsTrigger>
+                <TabsTrigger value="customer">By Customer</TabsTrigger>
+                <TabsTrigger value="booker">By Booker</TabsTrigger>
+            </TabsList>
+            <TabsContent value="area">
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Area</TableHead>
+                            <TableHead className="text-right">Orders</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Faisalabad</TableCell>
+                            <TableCell className="text-right">589</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Lahore</TableCell>
+                            <TableCell className="text-right">412</TableCell>
+                        </TableRow>
+                         <TableRow>
+                            <TableCell>Gojra</TableCell>
+                            <TableCell className="text-right">288</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TabsContent>
+            <TabsContent value="customer">
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Customer</TableHead>
+                            <TableHead className="text-right">Orders</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Ali Clinic</TableCell>
+                            <TableCell className="text-right">102</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>National Hospital</TableCell>
+                            <TableCell className="text-right">88</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TabsContent>
+             <TabsContent value="booker">
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Booker</TableHead>
+                            <TableHead className="text-right">Orders</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>Ali Khan</TableCell>
+                            <TableCell className="text-right">700</TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>Fatima Ahmed</TableCell>
+                            <TableCell className="text-right">589</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TabsContent>
+        </Tabs>
+    )
+}
+
+function InvoicesDetailView() {
+    return (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Invoice ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {mockInvoices.map(invoice => (
+                    <TableRow key={invoice.id}>
+                        <TableCell>{invoice.id}</TableCell>
+                        <TableCell>Customer {invoice.id.slice(-1)}</TableCell>
+                        <TableCell><Badge className={statusColors[invoice.status]}>{invoice.status}</Badge></TableCell>
+                        <TableCell className="text-right">PKR {invoice.amount.toFixed(2)}</TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    )
+}
+
+
 function AdminDashboard() {
+    const [openCard, setOpenCard] = useState<string | null>(null);
+    const handleCardToggle = (cardTitle: string) => {
+        setOpenCard(current => current === cardTitle ? null : cardTitle);
+    }
+  
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {summaryCards.map(card => (
-            <Card key={card.title}>
-                <CardHeader>
-                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-2xl font-bold">{card.value}</p>
-                </CardContent>
+          
+        <Collapsible open={openCard === summaryData.totalOrders.title} onOpenChange={() => handleCardToggle(summaryData.totalOrders.title)}>
+            <Card>
+                <CollapsibleTrigger asChild>
+                     <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                        <div>
+                            <CardTitle className="text-sm font-medium">{summaryData.totalOrders.title}</CardTitle>
+                             <p className="text-2xl font-bold">{summaryData.totalOrders.value}</p>
+                        </div>
+                        <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalOrders.title && "rotate-180")} />
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <CardContent>
+                       <OrdersDetailView />
+                    </CardContent>
+                </CollapsibleContent>
             </Card>
-        ))}
+        </Collapsible>
+        
+        <Collapsible open={openCard === summaryData.totalSales.title} onOpenChange={() => handleCardToggle(summaryData.totalSales.title)}>
+            <Card>
+                <CollapsibleTrigger asChild>
+                     <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                        <div>
+                            <CardTitle className="text-sm font-medium">{summaryData.totalSales.title}</CardTitle>
+                             <p className="text-2xl font-bold">{summaryData.totalSales.value}</p>
+                        </div>
+                        <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.totalSales.title && "rotate-180")} />
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <CardContent>
+                        <InvoicesDetailView />
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
+
+         <Collapsible open={openCard === summaryData.paymentsReceived.title} onOpenChange={() => handleCardToggle(summaryData.paymentsReceived.title)}>
+            <Card>
+                <CollapsibleTrigger asChild>
+                     <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                        <div>
+                            <CardTitle className="text-sm font-medium">{summaryData.paymentsReceived.title}</CardTitle>
+                            <p className="text-2xl font-bold">{summaryData.paymentsReceived.value}</p>
+                        </div>
+                         <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.paymentsReceived.title && "rotate-180")} />
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <CardContent>
+                        <InvoicesDetailView />
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -143,5 +305,3 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
-
-    
