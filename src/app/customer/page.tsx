@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { sampleBid, productsWithBatches as allProducts, salesReturns } from "@/lib/data";
+import { bids, productsWithBatches as allProducts, salesReturns } from "@/lib/data";
 import Image from "next/image";
 import { ShoppingCart, Tag, Search, Bell, Undo2, History, FileText, PlusCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { HelpTooltip } from "@/components/ui/help-tooltip";
 
 const productCategories = ["All", "Cardiovascular", "Diabetes", "Antibiotics"];
+const sampleBid = bids[0];
 
 function ProductCard({ product }: { product: (typeof allProducts)[0] }) {
     return (
@@ -313,13 +314,15 @@ function B2BPortal() {
                              </div>
                              <Badge variant="secondary">{sampleBid.status}</Badge>
                         </div>
-                        <div className="border bg-amber-50 p-3 rounded-lg">
-                             <p className="text-sm font-semibold text-amber-800">Counter-Offer: PKR 1925.00</p>
-                             <div className="flex gap-2 mt-2">
-                                <Button size="sm" className="w-full">Accept</Button>
-                                <Button size="sm" variant="destructive" className="w-full">Reject</Button>
-                             </div>
-                        </div>
+                        {sampleBid.status === 'Countered' && (
+                            <div className="border bg-amber-50 p-3 rounded-lg">
+                                <p className="text-sm font-semibold text-amber-800">Counter-Offer: PKR 1925.00</p>
+                                <div className="flex gap-2 mt-2">
+                                    <Button size="sm" className="w-full">Accept</Button>
+                                    <Button size="sm" variant="destructive" className="w-full">Reject</Button>
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -412,3 +415,5 @@ export default function CustomerPage() {
         </SidebarProvider>
     );
 }
+
+    
