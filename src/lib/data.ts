@@ -1,5 +1,5 @@
 
-import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData, SalesTeamMember } from "@/lib/types";
+import type { Distributor, Bid, Delivery, StatCard, Product, ProductBatch, SalesReturn, AccountSummary, Invoice, Transaction, AuditLog, AnalyticsData, SalesTeamMember, Order } from "@/lib/types";
 import { Users, Package, Clock, BarChart } from "lucide-react";
 
 export type TimeFrame = '7d' | '30d' | '1y';
@@ -227,6 +227,55 @@ export const mockInvoices: Invoice[] = [
     { id: "ORD-9869", date: "2023-09-19", dueDate: "2023-10-19", amount: 820000.00, status: "Overdue by 34 days" },
     { id: "ORD-9865", date: "2023-08-15", dueDate: "2023-09-14", amount: 720000.00, status: "Paid" },
 ];
+
+export const areaOrders = {
+    "Faisalabad": [
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+    ],
+    "Lahore": [
+        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing" },
+    ],
+    "Gojra": [
+        { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered" },
+    ]
+}
+
+export const customerOrders = {
+    "Ali Clinic": [
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
+        { id: "ORD-9865", customer: "Ali Clinic", booker: "Ali Khan", amount: 320000.00, status: "Delivered" },
+    ],
+    "National Hospital": [
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+    ]
+}
+
+export const bookerOrders = {
+    "Ali Khan": [
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
+        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing" },
+    ],
+    "Fatima Ahmed": [
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+         { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered" },
+    ]
+}
+
+export const selectedOrderData = {
+    id: "ORD-9872",
+    customer: "Ali Clinic",
+    booker: "Ali Khan",
+    amount: 450000.00,
+    status: "Delivered",
+    date: "2023-10-22",
+    items: [
+        { product: "Amlodipine 5mg", quantity: 100, price: 2000, total: 200000 },
+        { product: "Metformin 500mg", quantity: 100, price: 1500, total: 150000 },
+        { product: "Panadol 500mg", quantity: 200, price: 500, total: 100000 },
+    ]
+}
+
 
 export const transactions: Transaction[] = [
      { id: "TRN-1234", date: "2023-10-25", description: "Payment for ORD-9872", type: 'Payment', credit: 450000, runningBalance: 4370500 },
