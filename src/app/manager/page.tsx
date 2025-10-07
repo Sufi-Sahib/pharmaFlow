@@ -268,13 +268,14 @@ function BookerOrdersView({ booker, orders, onBack, onOrderClick }: { booker: st
 }
 
 
-function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () => void, backView: 'area_details' | 'customer_details' | 'booker_details' }) {
+function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () => void, backView: 'area_details' | 'customer_details' | 'booker_details' | 'invoices' }) {
     const subtotal = order.items.reduce((acc: number, item: any) => acc + item.total, 0);
     const backButtonText = () => {
         switch(backView) {
             case 'area_details': return 'Area Orders';
             case 'customer_details': return 'Customer Orders';
             case 'booker_details': return 'Booker Orders';
+            case 'invoices': return 'Invoices';
             default: return 'Back';
         }
     }
@@ -326,7 +327,7 @@ function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () 
 }
 
 
-function InvoicesDetailView() {
+function InvoicesDetailView({ onInvoiceClick }: { onInvoiceClick: (orderId: string) => void }) {
     return (
         <Table>
             <TableHeader>
@@ -339,7 +340,7 @@ function InvoicesDetailView() {
             </TableHeader>
             <TableBody>
                 {mockInvoices.map(invoice => (
-                    <TableRow key={invoice.id}>
+                    <TableRow key={invoice.id} onClick={() => onInvoiceClick(invoice.id)} className="cursor-pointer">
                         <TableCell>{invoice.id}</TableCell>
                         <TableCell>Customer {invoice.id.slice(-1)}</TableCell>
                         <TableCell><Badge className={statusColors[invoice.status]}>{invoice.status}</Badge></TableCell>
@@ -355,20 +356,30 @@ function InvoicesDetailView() {
 function AdminDashboard() {
     const [openCard, setOpenCard] = useState<string | null>(null);
     const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
+    const [salesDetailState, setSalesDetailState] = useState({ view: 'list', orderId: ''});
+    const [paymentsDetailState, setPaymentsDetailState] = useState({ view: 'list', orderId: ''});
 
     const handleCardToggle = (cardTitle: string) => {
         setOpenCard(current => {
             if (current === cardTitle) {
+                // If clicking the same card, reset its detail view state
                 if (cardTitle === summaryData.totalOrders.title) {
                     setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
                 }
+                 if (cardTitle === summaryData.totalSales.title) {
+                    setSalesDetailState({ view: 'list', orderId: '' });
+                }
+                if (cardTitle === summaryData.paymentsReceived.title) {
+                    setPaymentsDetailState({ view: 'list', orderId: '' });
+                }
                 return null;
             }
+             // Reset states when switching to a new card
+            setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
+            setSalesDetailState({ view: 'list', orderId: '' });
+            setPaymentsDetailState({ view: 'list', orderId: '' });
             return cardTitle;
         });
-        if (cardTitle === summaryData.totalOrders.title) {
-           setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
-        }
     }
 
     const renderOrdersContent = () => {
@@ -410,6 +421,28 @@ function AdminDashboard() {
                         />;
         }
     }
+
+     const renderSalesContent = () => {
+        if (salesDetailState.view === 'invoice_detail') {
+            return <OrderInvoiceView 
+                        order={selectedOrderData} 
+                        onBack={() => setSalesDetailState({ view: 'list', orderId: '' })} 
+                        backView="invoices"
+                    />
+        }
+        return <InvoicesDetailView onInvoiceClick={(orderId) => setSalesDetailState({ view: 'invoice_detail', orderId })} />
+    }
+
+    const renderPaymentsContent = () => {
+        if (paymentsDetailState.view === 'invoice_detail') {
+            return <OrderInvoiceView 
+                        order={selectedOrderData} 
+                        onBack={() => setPaymentsDetailState({ view: 'list', orderId: '' })} 
+                        backView="invoices"
+                    />
+        }
+        return <InvoicesDetailView onInvoiceClick={(orderId) => setPaymentsDetailState({ view: 'invoice_detail', orderId })} />
+    }
   
   return (
     <div className="space-y-6">
@@ -447,7 +480,7 @@ function AdminDashboard() {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
-                        <InvoicesDetailView />
+                       {renderSalesContent()}
                     </CardContent>
                 </CollapsibleContent>
             </Card>
@@ -466,7 +499,7 @@ function AdminDashboard() {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
-                        <InvoicesDetailView />
+                        {renderPaymentsContent()}
                     </CardContent>
                 </CollapsibleContent>
             </Card>
