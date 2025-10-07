@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useMemo, useRef } from "react";
@@ -777,15 +776,20 @@ function ProductInsights() {
                     <h3 className="font-semibold mb-2 text-lg">Requested Products</h3>
                     <div className="space-y-3">
                         {productRequests.map(req => (
-                            <div key={req.id} className="flex items-center gap-3 p-2 border rounded-lg">
-                                <ShoppingBasket className="h-5 w-5 text-muted-foreground" />
+                            <div key={req.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                                <ShoppingBasket className="h-5 w-5 text-muted-foreground mt-1" />
                                 <div className="flex-grow">
                                     <p className="font-semibold">{req.productName}</p>
                                     <p className="text-xs text-muted-foreground">Requested by: {req.customer} | Qty: {req.quantity}</p>
                                 </div>
-                                <Button size="sm" variant="outline" onClick={() => toast({ title: `Sourcing for ${req.productName} initiated.` })}>
-                                    Source
-                                </Button>
+                                <div className="flex flex-col gap-2">
+                                     <Button size="sm" variant="outline" onClick={() => toast({ title: "Request Confirmed", description: `${req.productName} will be stocked in 7 days.`})}>
+                                        In Stock
+                                    </Button>
+                                    <Button size="sm" variant="destructive" onClick={() => toast({ title: "Request Rejected", description: `${req.productName} is not under our distribution.` })}>
+                                        Reject
+                                    </Button>
+                                </div>
                             </div>
                         ))}
                     </div>
