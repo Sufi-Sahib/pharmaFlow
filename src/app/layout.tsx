@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/layout/providers';
 
@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'PharmaFlow',
   description: 'PharmaFlow MVP by Firebase Studio',
   manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
   themeColor: '#00a9e0',
 };
 
