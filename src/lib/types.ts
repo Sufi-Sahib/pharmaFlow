@@ -29,12 +29,20 @@ export type Bid = {
   status: "Requested" | "Countered" | "Accepted" | "Expired";
 };
 
+export type OrderItem = {
+    product: string;
+    quantity: number;
+    price: number;
+    total: number;
+}
+
 export type Order = {
   id: string;
   customer: string;
   booker: string;
   amount: number;
   status: "Delivered" | "Shipped" | "Processing" | "Pending";
+  items: OrderItem[];
 };
 
 export type Delivery = {
@@ -166,5 +174,3 @@ export type AnalyticsData = {
     topProductsByVolume: ChartDataItem[];
     promisingNewCustomers: CustomerItem[];
 }
-
-    

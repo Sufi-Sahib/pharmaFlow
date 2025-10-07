@@ -229,6 +229,17 @@ export const productsWithBatches: Product[] = [
             price: 3500,
         }
     },
+    {
+        name: "Panadol 500mg",
+        category: "Painkiller",
+        imageUrl: "https://picsum.photos/seed/product4/200/200",
+        price: 500,
+        inStock: true,
+        stock: 1000,
+        batches: [
+             { batchNumber: "P789", expiryDate: "2025-10-31", stock: 1000 }
+        ]
+    },
 ];
 
 export const salesReturns: SalesReturn[] = [
@@ -240,6 +251,12 @@ export const salesTeam: SalesTeamMember[] = [
   { name: "Ali Khan", target: 1500000, achieved: 1250000 },
   { name: "Fatima Ahmed", target: 2000000, achieved: 2150000 },
 ];
+
+export const deliveryStaff = [
+    { id: 'staff-1', name: 'Zainab Mir' },
+    { id: 'staff-2', name: 'Umar Farooq' },
+    { id: 'staff-3', name: 'Ayesha Khan' },
+]
 
 export const accountSummary: AccountSummary = {
   customerName: "National Hospital, Faisalabad",
@@ -262,35 +279,35 @@ export const mockInvoices: Invoice[] = [
 
 export const areaOrders = {
     "Faisalabad": [
-        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
-        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered", items: [] },
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped", items: [] },
     ],
     "Lahore": [
-        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing" },
+        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing", items: [] },
     ],
     "Gojra": [
-        { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered" },
+        { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered", items: [] },
     ]
 }
 
 export const customerOrders = {
     "Ali Clinic": [
-        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
-        { id: "ORD-9865", customer: "Ali Clinic", booker: "Ali Khan", amount: 320000.00, status: "Delivered" },
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered", items: [] },
+        { id: "ORD-9865", customer: "Ali Clinic", booker: "Ali Khan", amount: 320000.00, status: "Delivered", items: [] },
     ],
     "National Hospital": [
-        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped", items: [] },
     ]
 }
 
 export const bookerOrders = {
     "Ali Khan": [
-        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
-        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing" },
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered", items: [] },
+        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing", items: [] },
     ],
     "Fatima Ahmed": [
-        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
-         { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered" },
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped", items: [] },
+         { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered", items: [] },
     ]
 }
 
@@ -353,10 +370,10 @@ const productPerformance = [
 ];
 
 export const newOrders: Order[] = [
-    { id: "ORD-9885", customer: "City Hospital", booker: "Ali Khan", amount: 250000.00, status: "Processing" },
-    { id: "ORD-9884", customer: "Wellness Pharmacy", booker: "Fatima Ahmed", amount: 75000.00, status: "Processing" },
-    { id: "ORD-9883", customer: "Hope Clinic", booker: "Direct", amount: 120000.00, status: "Processing" },
-    { id: "ORD-9882", customer: "Crescent Medicos", booker: "Ali Khan", amount: 32000.00, status: "Processing" },
+    { id: "ORD-9885", customer: "City Hospital", booker: "Ali Khan", amount: 250000.00, status: "Processing", items: [{product: "Amlodipine 5mg", quantity: 50, price: 2000, total: 100000}, {product: "Metformin 500mg", quantity: 50, price: 1500, total: 75000}] },
+    { id: "ORD-9884", customer: "Wellness Pharmacy", booker: "Fatima Ahmed", amount: 75000.00, status: "Processing", items: [{product: "Metformin 500mg", quantity: 50, price: 1500, total: 75000}] },
+    { id: "ORD-9883", customer: "Hope Clinic", booker: "Direct", amount: 120000.00, status: "Processing", items: [{product: "Panadol 500mg", quantity: 240, price: 500, total: 120000}] },
+    { id: "ORD-9882", customer: "Crescent Medicos", booker: "Ali Khan", amount: 32000.00, status: "Processing", items: [{product: "Amlodipine 5mg", quantity: 16, price: 2000, total: 32000}] },
 ];
 
 
@@ -420,7 +437,3 @@ export const superAdminAnalyticsData = {
         salesByDistributor: distributors.map(d => ({ name: d.companyName, value: d.currentSales * 12, previousValue: d.currentSales * 12 * 0.9 })),
     }
 }
-
-    
-
-    

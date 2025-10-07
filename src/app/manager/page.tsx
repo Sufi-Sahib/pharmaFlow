@@ -10,8 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit } from "lucide-react";
-import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders } from "@/lib/data";
+import { FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft, Truck, Edit, PlusCircle, MinusCircle, Search } from "lucide-react";
+import { salesReturns, salesTeam, mockInvoices, type Order, areaOrders, customerOrders, bookerOrders, selectedOrderData, newOrders, deliveryStaff, productsWithBatches } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 
 const summaryData = {
@@ -40,78 +42,177 @@ const statusColors: { [key: string]: string } = {
     "Overdue by 34 days": "bg-red-100 text-red-800",
 }
 
-function OrderFulfillmentCard() {
-    const { toast } = useToast();
-    const bookerSourcedOrders = newOrders.filter(o => o.booker !== 'Direct');
-    const customerSourcedOrders = newOrders.filter(o => o.booker === 'Direct');
+function EditOrderView({ order, onBack, onSave }: { order: Order, onBack: () => void, onSave: (updatedOrder: Order) => void }) {
+    const [editedOrder, setEditedOrder] = useState(order);
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const handleAssign = (orderId: string) => {
-        toast({
-            title: "Order Assigned",
-            description: `Order ${orderId} has been assigned for delivery.`
-        });
+    const handleQuantityChange = (productName: string, newQuantity: number) => {
+        const updatedItems = editedOrder.items.map(item =>
+            item.product === productName ? { ...item, quantity: Math.max(0, newQuantity), total: item.price * Math.max(0, newQuantity) } : item
+        );
+        const filteredItems = updatedItems.filter(item => item.quantity > 0);
+        const newTotalAmount = filteredItems.reduce((acc, item) => acc + item.total, 0);
+        setEditedOrder({ ...editedOrder, items: filteredItems, amount: newTotalAmount });
+    };
+    
+    const handleAddProduct = (product: typeof productsWithBatches[0]) => {
+        if (editedOrder.items.some(item => item.product === product.name)) return;
+        
+        const newItem = {
+            product: product.name,
+            quantity: 1,
+            price: product.price,
+            total: product.price,
+        };
+        
+        const updatedItems = [...editedOrder.items, newItem];
+        const newTotalAmount = updatedItems.reduce((acc, item) => acc + item.total, 0);
+        setEditedOrder({ ...editedOrder, items: updatedItems, amount: newTotalAmount });
     }
 
-    const handleEdit = (orderId: string) => {
-        toast({
-            title: "Edit Order",
-            description: `Opening editor for order ${orderId}.`
-        });
-    }
-
-    const OrderList = ({ orders }: { orders: Order[] }) => (
-         <Table>
-            <TableHeader>
-                <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {orders.map(order => (
-                    <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.id}</TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell className="text-right">PKR {order.amount.toLocaleString()}</TableCell>
-                        <TableCell className="text-right space-x-2">
-                             <Button variant="outline" size="sm" onClick={() => handleEdit(order.id)}>
-                                <Edit className="mr-2 h-4 w-4" /> Edit
-                            </Button>
-                            <Button size="sm" onClick={() => handleAssign(order.id)}>
-                                <Truck className="mr-2 h-4 w-4" /> Assign
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+    const availableProducts = productsWithBatches.filter(p => 
+        !editedOrder.items.some(item => item.product === p.name) &&
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <Card className="col-span-1 lg:col-span-3">
-             <CardHeader>
-                <CardTitle>New Order Fulfillment</CardTitle>
-                <CardDescription>Review, edit, and assign new orders for delivery.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Tabs defaultValue="booker">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="booker">Booker Orders ({bookerSourcedOrders.length})</TabsTrigger>
-                        <TabsTrigger value="customer">Customer Orders ({customerSourcedOrders.length})</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="booker">
-                        <OrderList orders={bookerSourcedOrders} />
-                    </TabsContent>
-                    <TabsContent value="customer">
-                        <OrderList orders={customerSourcedOrders} />
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
-        </Card>
-    );
+        <div>
+            <Button variant="ghost" onClick={onBack} className="mb-4"><ArrowLeft className="mr-2" /> Back to Orders</Button>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Editing Order: {editedOrder.id}</CardTitle>
+                    <CardDescription>Customer: {editedOrder.customer} | Booker: {editedOrder.booker}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <h3 className="font-semibold mb-2">Order Items</h3>
+                        <div className="space-y-2">
+                             {editedOrder.items.map(item => (
+                                <div key={item.product} className="flex items-center gap-2 border p-2 rounded-md">
+                                    <div className="flex-grow">
+                                        <p className="font-medium text-sm">{item.product}</p>
+                                        <p className="text-xs text-muted-foreground">PKR {item.price.toFixed(2)}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleQuantityChange(item.product, item.quantity - 1)}><MinusCircle className="h-4 w-4" /></Button>
+                                        <Input type="number" value={item.quantity} onChange={(e) => handleQuantityChange(item.product, parseInt(e.target.value) || 0)} className="h-8 w-14 text-center" />
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleQuantityChange(item.product, item.quantity + 1)}><PlusCircle className="h-4 w-4" /></Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                         <h3 className="font-semibold mb-2">Add Products</h3>
+                         <div className="relative mb-2">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                                placeholder="Search products to add..." 
+                                className="pl-8"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                            {availableProducts.map(p => (
+                                <div key={p.name} className="flex items-center gap-2 p-2 rounded-md hover:bg-muted">
+                                    <div className="flex-grow">
+                                        <p className="text-sm font-medium">{p.name}</p>
+                                        <p className="text-xs text-muted-foreground">PKR {p.price.toFixed(2)}</p>
+                                    </div>
+                                    <Button size="sm" variant="outline" onClick={() => handleAddProduct(p)}><PlusCircle className="mr-2 h-4 w-4" /> Add</Button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-between items-center">
+                    <div className="text-lg font-bold">New Total: PKR {editedOrder.amount.toLocaleString()}</div>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={onBack}>Cancel</Button>
+                        <Button onClick={() => onSave(editedOrder)}>Save Changes</Button>
+                    </div>
+                </CardFooter>
+            </Card>
+        </div>
+    )
 }
+
+
+function OrderFulfillmentCard({
+  orders,
+  onEdit,
+  onAssign,
+}: {
+  orders: Order[];
+  onEdit: (order: Order) => void;
+  onAssign: (order: Order) => void;
+}) {
+  const bookerSourcedOrders = orders.filter((o) => o.booker !== 'Direct');
+  const customerSourcedOrders = orders.filter((o) => o.booker === 'Direct');
+
+  const OrderList = ({ ordersToShow }: { ordersToShow: Order[] }) => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Order ID</TableHead>
+          <TableHead>Customer</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {ordersToShow.map((order) => (
+          <TableRow key={order.id}>
+            <TableCell className="font-medium">{order.id}</TableCell>
+            <TableCell>{order.customer}</TableCell>
+            <TableCell className="text-right">
+              PKR {order.amount.toLocaleString()}
+            </TableCell>
+            <TableCell className="text-right space-x-2">
+              <Button variant="outline" size="sm" onClick={() => onEdit(order)}>
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </Button>
+              <Button size="sm" onClick={() => onAssign(order)}>
+                <Truck className="mr-2 h-4 w-4" /> Assign
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
+  return (
+    <Card className="col-span-1 lg:col-span-3">
+      <CardHeader>
+        <CardTitle>New Order Fulfillment</CardTitle>
+        <CardDescription>
+          Review, edit, and assign new orders for delivery.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="booker">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="booker">
+              Booker Orders ({bookerSourcedOrders.length})
+            </TabsTrigger>
+            <TabsTrigger value="customer">
+              Customer Orders ({customerSourcedOrders.length})
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="booker">
+            <OrderList ordersToShow={bookerSourcedOrders} />
+          </TabsContent>
+          <TabsContent value="customer">
+            <OrderList ordersToShow={customerSourcedOrders} />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 function OrdersDetailView({ onAreaClick, onCustomerClick, onBookerClick }: { onAreaClick: (area: string) => void, onCustomerClick: (customer: string) => void, onBookerClick: (booker: string) => void }) {
     return (
@@ -531,6 +632,7 @@ function SalesTeamMemberDetailView({ member, onBack }: { member: any, onBack: ()
 }
 
 function AdminDashboard() {
+    const { toast } = useToast();
     const [openCard, setOpenCard] = useState<string | null>(null);
     const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
     const [salesDetailState, setSalesDetailState] = useState({ view: 'list', orderId: ''});
@@ -538,6 +640,36 @@ function AdminDashboard() {
     const [receivablesDetailState, setReceivablesDetailState] = useState({ view: 'list', orderId: ''});
     const [salesReturnDetailState, setSalesReturnDetailState] = useState({ view: 'list', returnId: '' });
     const [salesTeamDetailState, setSalesTeamDetailState] = useState<{ view: 'list' | 'detail', memberName: string | null }>({ view: 'list', memberName: null });
+    const [fulfillmentState, setFulfillmentState] = useState<{ view: 'list' | 'edit'; order: Order | null; isAssignDialogOpen: boolean; }>({ view: 'list', order: null, isAssignDialogOpen: false });
+    const [liveOrders, setLiveOrders] = useState<Order[]>(newOrders);
+
+
+    const handleEditOrder = (order: Order) => {
+        setFulfillmentState({ view: 'edit', order: JSON.parse(JSON.stringify(order)), isAssignDialogOpen: false });
+    };
+    
+    const handleSaveOrder = (updatedOrder: Order) => {
+        setLiveOrders(prevOrders => prevOrders.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+        setFulfillmentState({ view: 'list', order: null, isAssignDialogOpen: false });
+        toast({
+            title: "Order Updated",
+            description: `Order ${updatedOrder.id} has been successfully updated.`
+        });
+    }
+
+    const handleAssignOrder = (order: Order) => {
+        setFulfillmentState(s => ({ ...s, order: order, isAssignDialogOpen: true }));
+    }
+    
+    const handleConfirmAssignment = (staffName: string) => {
+        if (!fulfillmentState.order) return;
+        toast({
+            title: "Order Assigned",
+            description: `Order ${fulfillmentState.order.id} has been assigned to ${staffName}.`
+        });
+        setLiveOrders(prev => prev.filter(o => o.id !== fulfillmentState.order?.id));
+        setFulfillmentState({ view: 'list', order: null, isAssignDialogOpen: false });
+    }
 
     const handleCardToggle = (cardTitle: string) => {
         setOpenCard(current => {
@@ -757,7 +889,21 @@ function AdminDashboard() {
       </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <OrderFulfillmentCard />
+         {fulfillmentState.view === 'list' ? (
+            <OrderFulfillmentCard
+              orders={liveOrders}
+              onEdit={handleEditOrder}
+              onAssign={handleAssignOrder}
+            />
+          ) : fulfillmentState.order ? (
+            <div className="lg:col-span-3">
+              <EditOrderView
+                order={fulfillmentState.order}
+                onBack={() => setFulfillmentState({ view: 'list', order: null, isAssignDialogOpen: false })}
+                onSave={handleSaveOrder}
+              />
+            </div>
+          ) : null}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -786,6 +932,32 @@ function AdminDashboard() {
           {renderSalesTeamContent()}
         </CardContent>
       </Card>
+      
+      <Dialog open={fulfillmentState.isAssignDialogOpen} onOpenChange={(open) => setFulfillmentState(s => ({ ...s, isAssignDialogOpen: open }))}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Assign Order: {fulfillmentState.order?.id}</DialogTitle>
+                <DialogDescription>Select a delivery staff member to assign this order to.</DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+                <Label htmlFor="delivery-staff">Delivery Staff</Label>
+                <Select>
+                    <SelectTrigger id="delivery-staff">
+                        <SelectValue placeholder="Select staff..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {deliveryStaff.map(staff => (
+                            <SelectItem key={staff.id} value={staff.name}>{staff.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setFulfillmentState(s => ({...s, isAssignDialogOpen: false}))}>Cancel</Button>
+                <Button onClick={() => handleConfirmAssignment("Selected Staff")}>Confirm Assignment</Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -803,5 +975,3 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
-
-    
