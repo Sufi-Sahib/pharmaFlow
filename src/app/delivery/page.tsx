@@ -7,7 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText, LocateFixed } from "lucide-react";
+import { Map, CheckCircle2, FileUp, ChevronsUpDown, Undo2, Truck, FileText, LocateFixed, AlertTriangle } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,8 @@ import { activeDeliveries } from "@/lib/data";
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useGeoLocation } from '@/hooks/use-geo-location';
+import { useToast } from '@/hooks/use-toast';
 
 function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void }) {
     return (
@@ -60,6 +62,20 @@ function DeliveryTaskList({ onSelectTask }: { onSelectTask: (task: any) => void 
 function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => void }) {
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [isReturning, setIsReturning] = useState(false);
+    const { toast } = useToast();
+    const { stampAction, loading, error } = useGeoLocation();
+
+    const handlePayment = async (method: string, details: any) => {
+        const result = await stampAction(`payment_${method}`, { orderId: task.id, ...details });
+         if (result.queued) {
+            toast({ title: "Offline", description: `Payment action queued.` });
+        } else if (result.success) {
+            toast({ title: "Payment Confirmed!", description: "Transaction has been logged." });
+        } else {
+            toast({ title: "Sync Error", description: `Could not sync payment. It has been queued.`, variant: "destructive" });
+        }
+        setIsConfirmed(true);
+    }
 
     if (isConfirmed) {
         return (
@@ -107,6 +123,7 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
                 <CardDescription>Order ID: {task.id} | Items: {task.itemsCount}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                {error && <Alert variant="destructive"><AlertTriangle className="h-4 w-4" /><AlertTitle>Location Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                 <div className="text-center bg-muted p-6 rounded-lg">
                     <p className="text-muted-foreground">Total Amount Due</p>
                     <p className="text-5xl font-bold font-headline">PKR {task.amount.toFixed(2)}</p>
@@ -116,9 +133,9 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
                 </Button>
                 <div className="space-y-4">
                      <p className="font-semibold text-center">Select Payment Method</p>
-                     <RadioGroup defaultValue="cash" onValueChange={() => setIsConfirmed(true)}>
+                     <RadioGroup onValueChange={(value) => handlePayment(value, { amount: task.amount })}>
                         <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="cash" id="cash" />
+                            <RadioGroupItem value="cash_received" id="cash" />
                             <Label htmlFor="cash" className="flex-grow text-base">Mark as Full Cash Received</Label>
                         </div>
                     </RadioGroup>
@@ -126,7 +143,7 @@ function PaymentCollectionScreen({ task, goBack }: { task: any; goBack: () => vo
                         <FileText className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
                         <p className="font-semibold">Upload Cheque Image</p>
                         <p className="text-sm text-muted-foreground">For partial or full payment</p>
-                        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={() => setIsConfirmed(true)} />
+                        <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={() => handlePayment('cheque_received', { amount: task.amount })} />
                     </div>
                 </div>
             </CardContent>

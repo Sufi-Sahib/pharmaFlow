@@ -20,21 +20,28 @@ import { useToast } from "@/hooks/use-toast";
 function BookerHome() {
   const [view, setView] = useState("home");
   const { toast } = useToast();
-  const { location, error, getLocation } = useGeoLocation();
+  const { location, error, stampAction, loading } = useGeoLocation();
 
-  const handleCheckIn = () => {
-    getLocation();
-    if (error) {
-      toast({ title: "Location Error", description: error, variant: "destructive" });
-    } else {
-      // In a real app, this would be sent to the server.
+  const handleCheckIn = async () => {
+    const result = await stampAction("route_check_in", { customerId: "all" });
+    if (result.queued) {
+      toast({ title: "Offline", description: "Check-in action queued." });
+    } else if (result.success) {
       toast({ title: "Checked In!", description: `Stamped at: ${location?.latitude}, ${location?.longitude}` });
+    } else {
+        toast({ title: "Sync Error", description: "Could not sync check-in. It has been queued.", variant: "destructive" });
     }
   }
 
-  const handleCheckOut = () => {
-     // In a real app, this would be sent to the server.
-    toast({ title: "Checked Out!", description: "Route concluded." });
+  const handleCheckOut = async () => {
+    const result = await stampAction("route_check_out", { customerId: "all" });
+    if (result.queued) {
+      toast({ title: "Offline", description: "Check-out action queued." });
+    } else if (result.success) {
+      toast({ title: "Checked Out!", description: "Route concluded." });
+    } else {
+        toast({ title: "Sync Error", description: "Could not sync check-out. It has been queued.", variant: "destructive" });
+    }
   }
   
   const handleViewChange = (newView: string) => setView(newView);
@@ -66,11 +73,12 @@ function BookerHome() {
                           We capture a one-time location stamp for actions like checking in. We don’t track you in the background.
                         </AlertDescription>
                     </Alert>
+                    {error && <Alert variant="destructive"><AlertTriangle className="h-4 w-4" /><AlertTitle>Location Error</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                     <div className="flex gap-2">
-                        <Button className="w-full" variant="outline" onClick={handleCheckIn}>Check-In (Stamp Location)</Button>
-                        <Button className="w-full" variant="outline" onClick={handleCheckOut}>Check-Out</Button>
+                        <Button className="w-full" variant="outline" onClick={handleCheckIn} disabled={loading}>{loading ? 'Stamping...' : 'Check-In (Stamp Location)'}</Button>
+                        <Button className="w-full" variant="outline" onClick={handleCheckOut} disabled={loading}>{loading ? 'Stamping...' : 'Check-Out'}</Button>
                     </div>
-                    {location && <p className="text-xs text-center text-muted-foreground">Last stamp: {location.latitude}, {location.longitude}</p>}
+                    {location && <p className="text-xs text-center text-muted-foreground">Last stamp: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}</p>}
                 </CardContent>
             </Card>
         </div>
@@ -102,6 +110,8 @@ function BookerHome() {
 function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
     const [isOnline, setIsOnline] = useState(true);
     const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+    const { toast } = useToast();
+    const { stampAction, loading } = useGeoLocation();
     
     const handleQuantityChange = (productName: string, quantity: number) => {
         setQuantities(prev => ({...prev, [productName]: Math.max(0, quantity)}));
@@ -109,6 +119,25 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
 
     const calculateBonus = (quantity: number) => {
         return Math.floor(quantity / 10);
+    }
+    
+    const handleSubmitOrder = async () => {
+        const orderItems = Object.entries(quantities).filter(([,qty]) => qty > 0).map(([name, quantity]) => ({name, quantity, bonus: calculateBonus(quantity)}));
+        if(orderItems.length === 0) {
+            toast({title: "Empty Order", description: "Please add items to the order.", variant: "destructive"});
+            return;
+        }
+        
+        const result = await stampAction("order_create_submit", { items: orderItems });
+        
+        if (result.queued) {
+          toast({ title: "Offline", description: "Order saved locally and will be synced when online." });
+        } else if (result.success) {
+          toast({ title: "Order Submitted!", description: "The order has been successfully submitted." });
+        } else {
+            toast({ title: "Sync Error", description: "Could not submit order. It has been queued for later.", variant: "destructive" });
+        }
+        goBack();
     }
 
     return (
@@ -178,8 +207,8 @@ function BookerOrderPlacement({ goBack }: { goBack: () => void; }) {
                             )
                         })}
                     </div>
-                    <Button className="w-full" size="lg">
-                        {isOnline ? "Confirm & Submit Order" : "Save Order Offline"}
+                    <Button className="w-full" size="lg" onClick={handleSubmitOrder} disabled={loading}>
+                        {loading ? "Processing..." : (isOnline ? "Confirm & Submit Order" : "Save Order Offline")}
                     </Button>
                      <Button className="w-full" size="lg" variant="outline" onClick={goBack}>Back to Home</Button>
                 </CardContent>
