@@ -24,6 +24,7 @@ const summaryData = {
     totalOrders: { title: "Total Orders", value: "1,289" },
     totalSales: { title: "Total Sales", value: "PKR 35,248,050" },
     paymentsReceived: { title: "Payments Received", value: "PKR 24,198,000" },
+    receivables: { title: "Receivables", value: "PKR 11,050,050" },
 }
 
 const statusColors: { [key: string]: string } = {
@@ -328,7 +329,17 @@ function OrderInvoiceView({ order, onBack, backView }: { order: any, onBack: () 
 }
 
 
-function InvoicesDetailView({ onInvoiceClick }: { onInvoiceClick: (orderId: string) => void }) {
+function InvoicesDetailView({ onInvoiceClick, filter }: { onInvoiceClick: (orderId: string) => void, filter?: 'all' | 'paid' | 'unpaid' }) {
+    const invoicesToDisplay = useMemo(() => {
+        if (filter === 'unpaid') {
+            return mockInvoices.filter(inv => inv.status !== 'Paid');
+        }
+        if (filter === 'paid') {
+            return mockInvoices.filter(inv => inv.status === 'Paid');
+        }
+        return mockInvoices;
+    }, [filter]);
+    
     return (
         <Table>
             <TableHeader>
@@ -340,7 +351,7 @@ function InvoicesDetailView({ onInvoiceClick }: { onInvoiceClick: (orderId: stri
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {mockInvoices.map(invoice => (
+                {invoicesToDisplay.map(invoice => (
                     <TableRow key={invoice.id} onClick={() => onInvoiceClick(invoice.id)} className="cursor-pointer">
                         <TableCell>{invoice.id}</TableCell>
                         <TableCell>Customer {invoice.id.slice(-1)}</TableCell>
@@ -440,6 +451,7 @@ function AdminDashboard() {
     const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
     const [salesDetailState, setSalesDetailState] = useState({ view: 'list', orderId: ''});
     const [paymentsDetailState, setPaymentsDetailState] = useState({ view: 'list', orderId: ''});
+    const [receivablesDetailState, setReceivablesDetailState] = useState({ view: 'list', orderId: ''});
     const [salesReturnDetailState, setSalesReturnDetailState] = useState({ view: 'list', returnId: '' });
     const [salesTeamDetailState, setSalesTeamDetailState] = useState<{ view: 'list' | 'detail', memberName: string | null }>({ view: 'list', memberName: null });
 
@@ -450,12 +462,14 @@ function AdminDashboard() {
                 if (cardTitle === summaryData.totalOrders.title) setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
                 if (cardTitle === summaryData.totalSales.title) setSalesDetailState({ view: 'list', orderId: '' });
                 if (cardTitle === summaryData.paymentsReceived.title) setPaymentsDetailState({ view: 'list', orderId: '' });
+                if (cardTitle === summaryData.receivables.title) setReceivablesDetailState({ view: 'list', orderId: '' });
                 return null;
             }
             // Reset states when switching to a new card
             setOrderDetailState({ view: 'tabs', area: '', customer: '', booker: '', orderId: '' });
             setSalesDetailState({ view: 'list', orderId: '' });
             setPaymentsDetailState({ view: 'list', orderId: '' });
+            setReceivablesDetailState({ view: 'list', orderId: '' });
             setSalesReturnDetailState({ view: 'list', returnId: ''});
             setSalesTeamDetailState({ view: 'list', memberName: null });
             return cardTitle;
@@ -510,7 +524,7 @@ function AdminDashboard() {
                         backView="invoices"
                     />
         }
-        return <InvoicesDetailView onInvoiceClick={(orderId) => setSalesDetailState({ view: 'invoice_detail', orderId })} />
+        return <InvoicesDetailView onInvoiceClick={(orderId) => setSalesDetailState({ view: 'invoice_detail', orderId })} filter="all" />
     }
 
     const renderPaymentsContent = () => {
@@ -521,7 +535,18 @@ function AdminDashboard() {
                         backView="invoices"
                     />
         }
-        return <InvoicesDetailView onInvoiceClick={(orderId) => setPaymentsDetailState({ view: 'invoice_detail', orderId })} />
+        return <InvoicesDetailView onInvoiceClick={(orderId) => setPaymentsDetailState({ view: 'invoice_detail', orderId })} filter="paid" />
+    }
+    
+    const renderReceivablesContent = () => {
+        if (receivablesDetailState.view === 'invoice_detail') {
+            return <OrderInvoiceView 
+                        order={selectedOrderData} 
+                        onBack={() => setReceivablesDetailState({ view: 'list', orderId: '' })} 
+                        backView="invoices"
+                    />
+        }
+        return <InvoicesDetailView onInvoiceClick={(orderId) => setReceivablesDetailState({ view: 'invoice_detail', orderId })} filter="unpaid" />
     }
 
     const renderSalesReturnContent = () => {
@@ -559,7 +584,7 @@ function AdminDashboard() {
                   <span className="text-sm font-medium">{member.name}</span>
                   <span className="text-sm text-muted-foreground">PKR {member.achieved.toLocaleString()} / PKR {member.target.toLocaleString()}</span>
                 </div>
-                 <Progress value={(member.achieved / member.target) * 100} />
+                 <Progress value={(member.achieved / member.target) * 100} className="mt-1" />
               </div>
             ))}
           </div>
@@ -568,7 +593,7 @@ function AdminDashboard() {
   
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           
         <Collapsible open={openCard === summaryData.totalOrders.title} onOpenChange={() => handleCardToggle(summaryData.totalOrders.title)}>
             <Card>
@@ -626,6 +651,25 @@ function AdminDashboard() {
                 </CollapsibleContent>
             </Card>
         </Collapsible>
+        
+        <Collapsible open={openCard === summaryData.receivables.title} onOpenChange={() => handleCardToggle(summaryData.receivables.title)}>
+            <Card>
+                <CollapsibleTrigger asChild>
+                     <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                        <div>
+                            <CardTitle className="text-sm font-medium">{summaryData.receivables.title}</CardTitle>
+                            <p className="text-2xl font-bold">{summaryData.receivables.value}</p>
+                        </div>
+                         <ChevronDown className={cn("h-5 w-5 transition-transform", openCard === summaryData.receivables.title && "rotate-180")} />
+                    </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <CardContent>
+                        {renderReceivablesContent()}
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -672,3 +716,5 @@ export default function ManagerPage() {
   );
 }
 
+
+    
