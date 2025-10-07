@@ -18,7 +18,7 @@ const roles = [
     { name: "Analytics", href: "/analytics", description: "View business intelligence dashboards." },
 ]
 
-export default function Home({ params: { lang } }: { params: { lang: string } }) {
+export default function Home() {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,7 +40,7 @@ export default function Home({ params: { lang } }: { params: { lang: string } })
                                 <CardDescription>{role.description}</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <Link href={`/${lang}${role.href}`}>
+                                <Link href={role.href}>
                                     <Button className="w-full">
                                         <span>Go to Dashboard</span>
                                         <ArrowRight className="ml-2" />
