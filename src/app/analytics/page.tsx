@@ -1,4 +1,5 @@
 
+
 "use client";
 import { useState, useMemo } from "react";
 import { AppHeader } from "@/components/layout/app-header";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, BarChart3, Bell, DollarSign, Package, Search, ShoppingCart, Users } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
