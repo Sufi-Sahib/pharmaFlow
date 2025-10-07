@@ -6,11 +6,11 @@ import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { BiddingOverview } from "@/components/dashboard/bidding-overview";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown } from "lucide-react";
+import { AlertCircle, FileText, UserPlus, PackagePlus, AlertTriangle, Users, BarChart, CheckCircle2, ChevronDown, ArrowLeft } from "lucide-react";
 import { salesReturns, salesTeam, invoices as mockInvoices } from "@/lib/data";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -35,7 +35,34 @@ const statusColors: { [key: string]: string } = {
     "Overdue by 34 days": "bg-red-100 text-red-800",
 }
 
-function OrdersDetailView() {
+const areaOrders = {
+    "Faisalabad": [
+        { id: "ORD-9872", customer: "Ali Clinic", booker: "Ali Khan", amount: 450000.00, status: "Delivered" },
+        { id: "ORD-9871", customer: "National Hospital", booker: "Fatima Ahmed", amount: 1250000.00, status: "Shipped" },
+    ],
+    "Lahore": [
+        { id: "ORD-9870", customer: "Lahore General", booker: "Ali Khan", amount: 820000.00, status: "Processing" },
+    ],
+    "Gojra": [
+        { id: "ORD-9869", customer: "Gojra Medicos", booker: "Fatima Ahmed", amount: 720000.00, status: "Delivered" },
+    ]
+}
+
+const selectedOrderData = {
+    id: "ORD-9872",
+    customer: "Ali Clinic",
+    booker: "Ali Khan",
+    amount: 450000.00,
+    status: "Delivered",
+    date: "2023-10-22",
+    items: [
+        { product: "Amlodipine 5mg", quantity: 100, price: 2000, total: 200000 },
+        { product: "Metformin 500mg", quantity: 100, price: 1500, total: 150000 },
+        { product: "Panadol 500mg", quantity: 200, price: 500, total: 100000 },
+    ]
+}
+
+function OrdersDetailView({ onAreaClick, onOrderClick }: { onAreaClick: (area: string) => void, onOrderClick: (orderId: string) => void }) {
     return (
         <Tabs defaultValue="area">
             <TabsList className="grid w-full grid-cols-3">
@@ -52,15 +79,15 @@ function OrdersDetailView() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
+                        <TableRow onClick={() => onAreaClick("Faisalabad")} className="cursor-pointer">
                             <TableCell>Faisalabad</TableCell>
                             <TableCell className="text-right">589</TableCell>
                         </TableRow>
-                        <TableRow>
+                        <TableRow onClick={() => onAreaClick("Lahore")} className="cursor-pointer">
                             <TableCell>Lahore</TableCell>
                             <TableCell className="text-right">412</TableCell>
                         </TableRow>
-                         <TableRow>
+                         <TableRow onClick={() => onAreaClick("Gojra")} className="cursor-pointer">
                             <TableCell>Gojra</TableCell>
                             <TableCell className="text-right">288</TableCell>
                         </TableRow>
@@ -111,6 +138,84 @@ function OrdersDetailView() {
     )
 }
 
+function AreaOrdersView({ area, orders, onBack, onOrderClick }: { area: string, orders: any[], onBack: () => void, onOrderClick: (orderId: string) => void }) {
+    return (
+        <div>
+            <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Summary</Button>
+            <CardTitle className="mb-4">Orders for {area}</CardTitle>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {orders.map(order => (
+                        <TableRow key={order.id} onClick={() => onOrderClick(order.id)} className="cursor-pointer">
+                            <TableCell>{order.id}</TableCell>
+                            <TableCell>{order.customer}</TableCell>
+                            <TableCell><Badge className={statusColors[order.status]}>{order.status}</Badge></TableCell>
+                            <TableCell className="text-right">PKR {order.amount.toFixed(2)}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    )
+}
+
+function OrderInvoiceView({ order, onBack }: { order: any, onBack: () => void }) {
+    const subtotal = order.items.reduce((acc: number, item: any) => acc + item.total, 0);
+    return (
+        <div>
+             <Button variant="ghost" onClick={onBack} className="mb-2"><ArrowLeft className="mr-2" /> Back to Area Orders</Button>
+             <Card>
+                 <CardHeader>
+                     <CardTitle>Order {order.id}</CardTitle>
+                     <CardDescription>
+                         Customer: {order.customer} <br />
+                         Booker: {order.booker} <br />
+                         Date: {order.date}
+                     </CardDescription>
+                 </CardHeader>
+                 <CardContent>
+                     <Table>
+                         <TableHeader>
+                             <TableRow>
+                                 <TableHead>Product</TableHead>
+                                 <TableHead>Quantity</TableHead>
+                                 <TableHead className="text-right">Unit Price</TableHead>
+                                 <TableHead className="text-right">Total</TableHead>
+                             </TableRow>
+                         </TableHeader>
+                         <TableBody>
+                             {order.items.map((item: any, index: number) => (
+                                <TableRow key={index}>
+                                     <TableCell>{item.product}</TableCell>
+                                     <TableCell>{item.quantity}</TableCell>
+                                     <TableCell className="text-right">PKR {item.price.toFixed(2)}</TableCell>
+                                     <TableCell className="text-right">PKR {item.total.toFixed(2)}</TableCell>
+                                 </TableRow>
+                             ))}
+                         </TableBody>
+                     </Table>
+                 </CardContent>
+                 <CardFooter className="flex justify-end">
+                    <div className="text-right">
+                        <p>Subtotal: PKR {subtotal.toFixed(2)}</p>
+                        <p>Tax (17%): PKR {(subtotal * 0.17).toFixed(2)}</p>
+                        <p className="font-bold text-lg">Total: PKR {(subtotal * 1.17).toFixed(2)}</p>
+                    </div>
+                 </CardFooter>
+             </Card>
+        </div>
+    )
+}
+
+
 function InvoicesDetailView() {
     return (
         <Table>
@@ -139,8 +244,44 @@ function InvoicesDetailView() {
 
 function AdminDashboard() {
     const [openCard, setOpenCard] = useState<string | null>(null);
+    const [orderDetailState, setOrderDetailState] = useState({ view: 'tabs', area: '', orderId: '' });
+
     const handleCardToggle = (cardTitle: string) => {
-        setOpenCard(current => current === cardTitle ? null : cardTitle);
+        setOpenCard(current => {
+            if (current === cardTitle) {
+                if (cardTitle === summaryData.totalOrders.title) {
+                    setOrderDetailState({ view: 'tabs', area: '', orderId: '' });
+                }
+                return null;
+            }
+            return cardTitle;
+        });
+        if (cardTitle === summaryData.totalOrders.title) {
+           setOrderDetailState({ view: 'tabs', area: '', orderId: '' });
+        }
+    }
+
+    const renderOrdersContent = () => {
+        switch (orderDetailState.view) {
+            case 'area_details':
+                return <AreaOrdersView 
+                            area={orderDetailState.area} 
+                            orders={areaOrders[orderDetailState.area as keyof typeof areaOrders] || []}
+                            onBack={() => setOrderDetailState({ view: 'tabs', area: '', orderId: '' })}
+                            onOrderClick={(orderId) => setOrderDetailState(s => ({ ...s, view: 'order_invoice', orderId }))}
+                        />;
+            case 'order_invoice':
+                return <OrderInvoiceView 
+                            order={selectedOrderData}
+                            onBack={() => setOrderDetailState(s => ({ ...s, view: 'area_details', orderId: '' }))}
+                        />;
+            case 'tabs':
+            default:
+                return <OrdersDetailView 
+                            onAreaClick={(area) => setOrderDetailState({ view: 'area_details', area, orderId: '' })}
+                            onOrderClick={(orderId) => setOrderDetailState({ view: 'order_invoice', area: '', orderId })}
+                        />;
+        }
     }
   
   return (
@@ -160,7 +301,7 @@ function AdminDashboard() {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                     <CardContent>
-                       <OrdersDetailView />
+                       {renderOrdersContent()}
                     </CardContent>
                 </CollapsibleContent>
             </Card>
@@ -305,3 +446,5 @@ export default function ManagerPage() {
     </SidebarProvider>
   );
 }
+
+    
