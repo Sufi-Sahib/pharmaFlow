@@ -82,21 +82,53 @@ export const distributors: Distributor[] = [
   },
 ];
 
-export const sampleBid: Bid = {
-  id: "bid-01",
-  product: {
-    name: "Amlodipine 5mg",
-    imageUrl: "https://picsum.photos/seed/product1/200/200",
-    sku: "AML-5MG-T30",
-  },
-  customer: {
-    name: "Ali Clinic, TTS-City",
-    avatarUrl: "https://picsum.photos/seed/avatar1/100/100",
-  },
-  requestedPrice: 1850,
-  quantity: 500,
-  status: "Requested",
-};
+export const bids: Bid[] = [
+    {
+      id: "bid-01",
+      product: {
+        name: "Amlodipine 5mg",
+        imageUrl: "https://picsum.photos/seed/product1/200/200",
+        sku: "AML-5MG-T30",
+      },
+      customer: {
+        name: "Ali Clinic, TTS-City",
+        avatarUrl: "https://picsum.photos/seed/avatar1/100/100",
+      },
+      requestedPrice: 1850,
+      quantity: 500,
+      status: "Requested",
+    },
+     {
+      id: "bid-02",
+      product: {
+        name: "Metformin 500mg",
+        imageUrl: "https://picsum.photos/seed/product2/200/200",
+        sku: "MET-500-T30",
+      },
+      customer: {
+        name: "National Hospital",
+        avatarUrl: "https://picsum.photos/seed/avatar5/100/100",
+      },
+      requestedPrice: 1500,
+      quantity: 1000,
+      status: "Requested",
+    },
+    {
+      id: "bid-03",
+      product: {
+        name: "Panadol 500mg",
+        imageUrl: "https://picsum.photos/seed/product4/200/200",
+        sku: "PAN-500-T100",
+      },
+      customer: {
+        name: "Chenab Pharmacy",
+        avatarUrl: "https://picsum.photos/seed/avatar6/100/100",
+      },
+      requestedPrice: 480,
+      quantity: 2000,
+      status: "Countered",
+    }
+];
 
 export const activeDeliveries: Delivery[] = [
   {
